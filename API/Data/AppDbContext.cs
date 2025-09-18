@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
-public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
+public class AppDbContext : IdentityDbContext
+                <AppUser, AppRole, int,
+                 IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>,
+                 IdentityRoleClaim<int>, IdentityUserToken<int>>
+
 {
     public AppDbContext(DbContextOptions options) : base(options) { }
 
@@ -45,6 +49,21 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
             .WithMany(s => s.ParentLinks)
             .HasForeignKey(ps => ps.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<AppUserRole>(userRole =>
+        {
+            userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+            userRole.HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.RoleId)
+                .IsRequired();
+
+            userRole.HasOne(ur => ur.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(ur => ur.UserId)
+                .IsRequired();
+        });
     }
 
 
