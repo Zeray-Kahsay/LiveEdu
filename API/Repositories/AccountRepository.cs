@@ -1,12 +1,3 @@
-using API.Data;
-using API.DTOs.Account;
-using API.DTOs.Account.User;
-using API.Entities;
-using API.Helpers;
-using API.Interfaces;
-using API.Services;
-using Microsoft.AspNetCore.Identity;
-
 namespace API.Repositories;
 
 public class AccountRepository (UserManager<AppUser> userManager,
