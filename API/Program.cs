@@ -14,6 +14,9 @@ builder.Services.AddIdentityServices();
 var app = builder.Build();
 
 
+app.UseGlobalExceptionHandler();
+
+
 
 
 // Configure the HTTP request pipeline.

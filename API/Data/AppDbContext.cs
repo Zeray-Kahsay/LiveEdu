@@ -28,12 +28,14 @@ public class AppDbContext : IdentityDbContext
         builder.Entity<Enrollment>()
             .HasOne(e => e.Student)
             .WithMany(s => s.Enrollments)
-            .HasForeignKey(e => e.StudentId);
+            .HasForeignKey(e => e.StudentId)
+            .OnDelete(DeleteBehavior.NoAction); // <- add Restrict to avoid multiple cascade paths
 
         builder.Entity<Enrollment>()
             .HasOne(e => e.Course)
             .WithMany(c => c.Enrollments)
-            .HasForeignKey(e => e.CourseId);
+            .HasForeignKey(e => e.CourseId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<ParentStudentLink>()
             .HasKey(ps => new { ps.ParentId, ps.StudentId });

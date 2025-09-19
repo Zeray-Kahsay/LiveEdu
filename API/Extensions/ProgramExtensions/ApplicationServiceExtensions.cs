@@ -1,4 +1,3 @@
-
 using System.Text;
 using API.Data;
 using API.Services;
@@ -34,7 +33,7 @@ public static class ApplicationServiceExtensions
         });
 
         // Jwt token settings strongly typed configuration
-        // services.Configure<JwtSettings>(config.GetSection("JwtSettings"));
+         services.Configure<JwtSettings>(config.GetSection("JwtSettings"));
         var jwtSettings = config
                             .GetSection("JwtSettings")
                             .Get<JwtSettings>() ?? throw new InvalidOperationException("Jwt settings is missing");
@@ -47,20 +46,29 @@ public static class ApplicationServiceExtensions
      .AddJwtBearer(options =>
      {
          var tokenKey = Encoding.UTF8.GetBytes(jwtSettings.TokenKey);
+
+         // Ensure HTTPS when validating tokens in production and keep the validated token available
+         options.RequireHttpsMetadata = true;
+         options.SaveToken = true;
+
          options.TokenValidationParameters = new TokenValidationParameters
          {
              ValidateIssuerSigningKey = true,
              IssuerSigningKey = new SymmetricSecurityKey(tokenKey),
-             ValidateIssuer = false,
-             ValidateAudience = false,
+             ValidateIssuer = !string.IsNullOrEmpty(jwtSettings.Issuer),
+             ValidIssuer = jwtSettings.Issuer,
+             ValidateAudience = !string.IsNullOrEmpty(jwtSettings.Audience),
+             ValidAudience = jwtSettings.Audience,
              ValidateLifetime = true,
+             // Reduce default clock skew for stricter expiration checks
+             ClockSkew = TimeSpan.Zero
          };
 
          options.Events = new JwtBearerEvents
          {
              OnMessageReceived = context =>
              {
-                 var accessToken = context.Request.Query["access_token"];
+                 var accessToken = context.Request.Query["access_token"].ToString();
 
                  // If the request is for the SignalR hub, read the access token from the query string
                  var path = context.HttpContext.Request.Path;
