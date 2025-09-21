@@ -1,6 +1,8 @@
 
+using System.Text.Json;
 using API.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
@@ -8,67 +10,65 @@ public static class DbInitializer
 {
     public static async Task Initialize
     (
-        AppDbContext context,
         UserManager<AppUser> userManager,
         RoleManager<AppRole> roleManager
         )
     {
-        // Ensure database is created
-        context.Database.EnsureCreated();
 
-        // Check if roles exist, if not create them
-        if (!roleManager.Roles.Any())
+        if (await userManager.Users.AnyAsync()) return;
+
+        var userData = await File.ReadAllTextAsync("Data/UserData.json");
+
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var users = JsonSerializer.Deserialize<List<AppUser>>(userData, options);
+
+        if (users is null) return;
+
+        var roles = new List<AppRole>
+       {
+        new(){ Name = "Admin"},
+        new(){ Name = "Teacher"},
+        new(){ Name = "Student"},
+        new(){ Name = "Parent"},
+       };
+
+        foreach (var role in roles)
         {
-            var roles = new List<AppRole>
-            {
-                new() { Name = "Admin" },
-                new() { Name = "Teacher" },
-                new () { Name = "Student" },
-                new () { Name = "Parent" }
-            };
-
-            foreach (var role in roles)
-            {
-                await roleManager.CreateAsync(role);
-            }
+            await roleManager.CreateAsync(role);
         }
 
-        // Check if users exist, if not create default users
-        if (!userManager.Users.Any())
+        foreach (var user in users)
         {
-            var adminUser = new AppUser
-            {
-                UserName = "admin",
-                Email = "admin@gmail.com",
-            };
-            await userManager.CreateAsync(adminUser, "Admin123!");
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-
-            var teacherUser = new AppUser
-            {
-                UserName = "teacher",
-                Email = "teacher1@gmail.com",
-            };
-            await userManager.CreateAsync(teacherUser, "Teacher123!");
-            await userManager.AddToRoleAsync(teacherUser, "Teacher");
-            var studentUser = new AppUser
-            {
-                UserName = "student",
-                Email = " student1@gmail.com",
-            };
-            await userManager.CreateAsync(studentUser, "Student123!");
-            await userManager.AddToRoleAsync(studentUser, "Student");
-            var parentUser = new AppUser
-            {
-                UserName = "parent",
-                Email = "parent1@gmail.com",
-            };
-            await userManager.CreateAsync(parentUser, "Parent123!");
-            await userManager.AddToRoleAsync(parentUser, "Parent");
+            user.UserName = user.UserName!.ToLower();
+            user.SecurityStamp = new Guid().ToString();
+            await userManager.CreateAsync(user, "Pa$$w0rd");
+            await userManager.AddToRoleAsync(user, "Student");
         }
 
+        var admin = new AppUser
+        {
+            FirstName = "Adminstrator",
+            LastName = "Adminstrator",
+            UserName = "admin@gmail.com",
+            Email = "admin@gmail.com",
+            CreatedAt = DateTime.UtcNow,
+            SecurityStamp = new Guid().ToString()
+        };
+        await userManager.CreateAsync(admin, "Pa$$w0rd");
+        await userManager.AddToRolesAsync(admin, ["Teacher", "Student", "Admin", "Parent"]);
+
+        var teacher = new AppUser
+        {
+            FirstName = "Teacher",
+            LastName = "Teacher",
+            UserName = "teacher@gmail.com",
+            Email = "teacher@gmail.com",
+            CreatedAt = DateTime.UtcNow,
+            SecurityStamp = new Guid().ToString()
+        };
+        await userManager.CreateAsync(teacher, "Pa$$w0rd");
+        await userManager.AddToRolesAsync(teacher, ["Teacher"]);
 
 
-        await context.SaveChangesAsync();
     }
 }

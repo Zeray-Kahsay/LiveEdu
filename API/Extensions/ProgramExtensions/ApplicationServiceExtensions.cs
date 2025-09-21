@@ -1,5 +1,7 @@
 using System.Text;
 using API.Data;
+using API.Interfaces;
+using API.Repositories;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,9 @@ public static class ApplicationServiceExtensions
         services.AddOpenApi();
         services.AddSwaggerGen();
 
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IAccountRepository, AccountRepository>();
+
         services.AddCors(options =>
         {
             options.AddPolicy("CorsPolicy", policy =>
@@ -33,7 +38,7 @@ public static class ApplicationServiceExtensions
         });
 
         // Jwt token settings strongly typed configuration
-         services.Configure<JwtSettings>(config.GetSection("JwtSettings"));
+        services.Configure<JwtSettings>(config.GetSection("JwtSettings"));
         var jwtSettings = config
                             .GetSection("JwtSettings")
                             .Get<JwtSettings>() ?? throw new InvalidOperationException("Jwt settings is missing");

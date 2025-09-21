@@ -56,7 +56,7 @@ public class GlobalExceptionMiddleware
 
         var dto = new ApiErrorDto
         {
-            StatusCode = status,
+            Status = status,
             Message = status == StatusCodes.Status500InternalServerError
                 ? "An unexpected error occurred."
                 : "One or more errors occurred.",
@@ -67,5 +67,5 @@ public class GlobalExceptionMiddleware
         await context.Response.WriteAsync(JsonSerializer.Serialize(dto, options));
     }
 
- 
+
 }

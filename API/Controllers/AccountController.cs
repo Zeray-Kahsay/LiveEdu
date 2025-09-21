@@ -19,20 +19,21 @@ public class AccountController(IAccountRepository accountRepository) : BaseContr
         }
 
         var errors = result.Errors?.ToArray() ?? new[] { "An unknown error occurred." };
-        var status = errors.Contains("Email is already taken") || errors.Contains("Username is already taken")
+        var status = errors.Any(e => e.Equals("Email is already taken", StringComparison.OrdinalIgnoreCase) ||
+                                     e.Equals("Username is already taken", StringComparison.OrdinalIgnoreCase))
             ? StatusCodes.Status400BadRequest
             : StatusCodes.Status500InternalServerError;
 
         var errorResponse = new ApiErrorDto
         {
-            StatusCode = status,
+            Status = status,
             Message = "Registration failed",
             Errors = errors
         };
         return StatusCode(status, errorResponse);
 
     }
-    
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
@@ -43,13 +44,14 @@ public class AccountController(IAccountRepository accountRepository) : BaseContr
         }
 
         var errors = result.Errors?.ToArray() ?? new[] { "An unknown error occurred." };
-        var status = errors.Contains("Invalid email or password.")
+        var status = errors.Any(e => e.Equals("Invalid email or password", StringComparison.OrdinalIgnoreCase))
             ? StatusCodes.Status401Unauthorized
             : StatusCodes.Status500InternalServerError;
+        Console.WriteLine(errors);
 
         var errorResponse = new ApiErrorDto
         {
-            StatusCode = status,
+            Status = status,
             Message = "Login failed",
             Errors = errors
         };

@@ -6,8 +6,9 @@ public class AppUser : IdentityUser<int>
 {
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
-    public DateTime DateOfBirth { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public string SchoolName { get; set; } = string.Empty;
+    public DateTime DateOfBirth { get; set; } // date format  YYYY-MM-DD
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<Course> CoursesTaught { get; set; } = [];
     public ICollection<Enrollment> Enrollments { get; set; } = [];
     // Link to children if parent

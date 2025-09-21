@@ -1,0 +1,82 @@
+[
+  {
+    "FirstName": "Alice",
+    "LastName": "Johnson",
+    "DateOfBirth": "1990-05-12",
+    "UserName": "alice.johnson90",
+    "Email": "alice.johnson90@example.com",
+    "SchoolName": "Greenwood University"
+  },
+  {
+    "FirstName": "Brian",
+    "LastName": "Smith",
+    "DateOfBirth": "1985-11-23",
+    "UserName": "bsmith85",
+    "Email": "bsmith85@example.com",
+    "SchoolName": "Riverside College"
+  },
+  {
+    "FirstName": "Catherine",
+    "LastName": "Lee",
+    "DateOfBirth": "1992-03-08",
+    "UserName": "cat.lee92",
+    "Email": "cat.lee92@example.com",
+    "SchoolName": "Hillcrest Institute"
+  },
+  {
+    "FirstName": "David",
+    "LastName": "Kim",
+    "DateOfBirth": "1988-07-19",
+    "UserName": "davidk88",
+    "Email": "davidk88@example.com",
+    "SchoolName": "Summit Technical School"
+  },
+  {
+    "FirstName": "Ella",
+    "LastName": "Martinez",
+    "DateOfBirth": "1995-01-30",
+    "UserName": "ella.martinez95",
+    "Email": "ella.martinez95@example.com",
+    "SchoolName": "Northview Academy"
+  },
+  {
+    "FirstName": "Frank",
+    "LastName": "Nguyen",
+    "DateOfBirth": "1979-09-14",
+    "UserName": "frankn79",
+    "Email": "frankn79@example.com",
+    "SchoolName": "Evergreen Polytechnic"
+  },
+  {
+    "FirstName": "Grace",
+    "LastName": "O'Connor",
+    "DateOfBirth": "2000-06-25",
+    "UserName": "grace.oconnor00",
+    "Email": "grace.oconnor00@example.com",
+    "SchoolName": "Lakeside University"
+  },
+  {
+    "FirstName": "Henry",
+    "LastName": "Patel",
+    "DateOfBirth": "1993-12-05",
+    "UserName": "henrypatel93",
+    "Email": "henrypatel93@example.com",
+    "SchoolName": "Metro Business School"
+  },
+  {
+    "FirstName": "Isabella",
+    "LastName": "Chen",
+    "DateOfBirth": "1987-04-17",
+    "UserName": "isachen87",
+    "Email": "isachen87@example.com",
+    "SchoolName": "Brighton Arts College"
+  },
+  {
+    "FirstName": "Jack",
+    "LastName": "Brown",
+    "DateOfBirth": "1991-08-09",
+    "UserName": "jackbrown91",
+    "Email": "jackbrown91@example.com",
+    "SchoolName": "Central State University"
+  }
+]

@@ -14,7 +14,7 @@ builder.Services.AddIdentityServices();
 var app = builder.Build();
 
 
-app.UseGlobalExceptionHandler();
+app.UseGlobalExceptionHandler(); // Custom global exception handler
 
 
 
@@ -23,6 +23,8 @@ app.UseGlobalExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
@@ -30,5 +32,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+await app.MigrateDatabase(); // Extension method to migrate database and seed data
 
 app.Run();

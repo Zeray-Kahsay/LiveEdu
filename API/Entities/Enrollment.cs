@@ -4,12 +4,16 @@ namespace API.Entities;
 public class Enrollment
 {
     public int EnrollmentId { get; set; }
+
     public int CourseId { get; set; }
     public Course Course { get; set; } = null!;
+
     public int StudentId { get; set; }
     public AppUser Student { get; set; } = null!;
-    public DateTime EnrollmentDate { get; set; }
+
+    public DateTime EnrolledAt { get; set; }
     public EnrollmentStatus Status { get; set; }
+    public bool IsActive  => Status == EnrollmentStatus.Enrolled;
 
 }
 

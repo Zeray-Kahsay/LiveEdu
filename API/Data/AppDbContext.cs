@@ -1,4 +1,3 @@
-
 using API.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -22,50 +21,80 @@ public class AppDbContext : IdentityDbContext
     {
         base.OnModelCreating(builder);
 
+
+
         builder.Entity<Enrollment>()
-            .HasKey(e => new { e.StudentId, e.CourseId });
+           .Property(e => e.Status)
+           .HasConversion<string>();
+
+
+        builder.Entity<Course>()
+          .HasOne(c => c.Teacher)
+          .WithMany(t => t.CoursesTaught)
+          .HasForeignKey(c => c.TeacherId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Session>()
+            .HasOne(s => s.Course)
+            .WithMany(c => c.Sessions)
+            .HasForeignKey(s => s.CourseId);
 
         builder.Entity<Enrollment>()
             .HasOne(e => e.Student)
             .WithMany(s => s.Enrollments)
-            .HasForeignKey(e => e.StudentId)
-            .OnDelete(DeleteBehavior.NoAction); // <- add Restrict to avoid multiple cascade paths
+            .HasForeignKey(e => e.StudentId);
 
         builder.Entity<Enrollment>()
             .HasOne(e => e.Course)
             .WithMany(c => c.Enrollments)
-            .HasForeignKey(e => e.CourseId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .HasForeignKey(e => e.CourseId);
 
         builder.Entity<ParentStudentLink>()
-            .HasKey(ps => new { ps.ParentId, ps.StudentId });
-
-        builder.Entity<ParentStudentLink>()
-            .HasOne(ps => ps.Parent)
+            .HasOne(p => p.Parent)
             .WithMany(p => p.ChildrenLinks)
-            .HasForeignKey(ps => ps.ParentId)
+            .HasForeignKey(p => p.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<ParentStudentLink>()
-            .HasOne(ps => ps.Student)
-            .WithMany(s => s.ParentLinks)
-            .HasForeignKey(ps => ps.StudentId)
+            .HasOne(p => p.Student)
+            .WithMany()
+            .HasForeignKey(p => p.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Entity<AppUserRole>(userRole =>
-        {
-            userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
+        builder.Entity<Attendance>()
+            .HasOne(a => a.Student)
+            .WithMany()
+            .HasForeignKey(a => a.StudentId);
 
-            userRole.HasOne(ur => ur.Role)
-                .WithMany(r => r.UserRoles)
-                .HasForeignKey(ur => ur.RoleId)
-                .IsRequired();
+        builder.Entity<Attendance>()
+            .HasOne(a => a.Session)
+            .WithMany()
+            .HasForeignKey(a => a.SessionId);
 
-            userRole.HasOne(ur => ur.User)
-                .WithMany(u => u.UserRoles)
-                .HasForeignKey(ur => ur.UserId)
-                .IsRequired();
-        });
+        builder.Entity<Submission>()
+            .HasOne(s => s.Student)
+            .WithMany()
+            .HasForeignKey(s => s.StudentId);
+
+        builder.Entity<Submission>()
+            .HasOne(s => s.Assignment)
+            .WithMany()
+            .HasForeignKey(s => s.AssignmentId);
+
+        // M-M
+        builder.Entity<AppUser>()
+                     .HasMany(au => au.UserRoles)
+                     .WithOne(ur => ur.User)
+                     .HasForeignKey(ur => ur.UserId)
+                     .IsRequired();
+
+        builder.Entity<AppRole>()
+               .HasMany(ap => ap.UserRoles)
+               .WithOne(ur => ur.Role)
+               .HasForeignKey(ar => ar.RoleId)
+               .IsRequired();
+
+
     }
 
 
