@@ -1,22 +1,13 @@
-
-
-
 type Variant = "spinner" | "dots" | "skeleton";
 
 interface Props {
   variant?: Variant;
   size?: "xs" | "sm" | "md" | "lg" | "xl"; // maps to Tailwind sizes
   colorClass?: string; // Tailwind color classes, e.g. "text-indigo-600"
-  label?: string | null; // optional accessible label (visible or screen-reader only)
+  label?: string | null; // optional accessible label (screen-reader only)
   className?: string;
 }
 
-/**
- * Tailwind-based loading indicator with 3 variants:
- * - spinner: SVG circular spinner (animate-spin)
- * - dots: 3 bouncing/pulsing dots
- * - skeleton: a rectangular shimmer/pulse bar (useful as a placeholder)
- */
 export default function LoadingIndicator({
   variant = "spinner",
   size = "md",
@@ -24,7 +15,7 @@ export default function LoadingIndicator({
   label = "Loading",
   className = "",
 }: Props) {
-  const sizeMap: Record<"xs" | "sm" | "md" | "lg" | "xl", string> = {
+  const sizeMap: Record<typeof size, string> = {
     xs: "w-4 h-4",
     sm: "w-5 h-5",
     md: "w-6 h-6",
@@ -39,28 +30,13 @@ export default function LoadingIndicator({
       <div
         role="status"
         aria-live="polite"
-        className={`inline-flex items-center space-x-2 ${className}`}
+        className={`inline-flex items-center space-x-1 ${className}`}
       >
         <span className="sr-only">{label}</span>
-        <span
-          className={`inline-block ${colorClass} ${spinnerSize}`}
-          aria-hidden
-        >
-          <span className="inline-flex items-end space-x-1">
-            {/* three dots with staggered animation delays */}
-            <span
-              className="inline-block rounded-full bg-current opacity-90 animate-pulse"
-              style={{ width: "6px", height: "6px", animationDelay: "0s" }}
-            />
-            <span
-              className="inline-block rounded-full bg-current opacity-90 animate-pulse"
-              style={{ width: "6px", height: "6px", animationDelay: "0.15s" }}
-            />
-            <span
-              className="inline-block rounded-full bg-current opacity-90 animate-pulse"
-              style={{ width: "6px", height: "6px", animationDelay: "0.3s" }}
-            />
-          </span>
+        <span className={`flex space-x-1 ${colorClass}`}>
+          <span className="bounce-dot"></span>
+          <span className="bounce-dot"></span>
+          <span className="bounce-dot"></span>
         </span>
       </div>
     );
@@ -71,17 +47,26 @@ export default function LoadingIndicator({
       <div role="status" aria-live="polite" className={className}>
         <span className="sr-only">{label}</span>
         <div
-          className={`rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse ${className}`}
+          className={`rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse`}
           style={{
             width: "100%",
-            height: size === "xs" ? 8 : size === "sm" ? 10 : size === "md" ? 12 : size === "lg" ? 16 : 20,
+            height:
+              size === "xs"
+                ? 8
+                : size === "sm"
+                ? 10
+                : size === "md"
+                ? 12
+                : size === "lg"
+                ? 16
+                : 20,
           }}
         />
       </div>
     );
   }
 
-  // default: spinner (SVG)
+  // default spinner variant (SVG)
   return (
     <div role="status" aria-live="polite" className={`inline-flex items-center ${className}`}>
       <span className="sr-only">{label}</span>

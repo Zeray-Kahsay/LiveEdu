@@ -1,5 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using API.Data;
 using API.Entities;
 using API.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -15,8 +17,9 @@ public class TokenService : ITokenService
     private readonly UserManager<AppUser> _userManager;
     private readonly SymmetricSecurityKey _key;
     private readonly JwtSettings _settings;
+    private readonly AppDbContext _context;
 
-    public TokenService(UserManager<AppUser> userManager, IOptions<JwtSettings> settings)
+    public TokenService(UserManager<AppUser> userManager, IOptions<JwtSettings> settings, AppDbContext context)
     {
         _userManager = userManager;
         _settings = settings.Value;
@@ -24,9 +27,12 @@ public class TokenService : ITokenService
         if (string.IsNullOrEmpty(tokenKey))
             throw new ArgumentNullException(nameof(tokenKey), "Token key is missing in JWT settings");
         _key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(tokenKey));
+        _context = context;
 
     }
-    public async Task<string> CreateToken(AppUser user)
+
+
+    public async Task<string> CreateToken(AppUser user, string deviceId)
     {
         if (user.Email is null) return $"No user with {user.Email} found";
 
@@ -38,7 +44,8 @@ public class TokenService : ITokenService
           new(JwtRegisteredClaimNames.UniqueName, user.UserName ?? string.Empty),
           new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
           new("firstName", user.FirstName ?? string.Empty),
-          new("lastName", user.LastName ?? string.Empty)
+          new("lastName", user.LastName ?? string.Empty),
+          new("deviceId", deviceId)
 
         };
 
@@ -60,5 +67,22 @@ public class TokenService : ITokenService
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
         return tokenHandler.WriteToken(token);
+    }
+
+
+    public async Task<string> CreateRefreshToken(AppUser appUser, string deviceId)
+    {
+        var refreshToken = new RefreshToken
+        {
+            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+            Expires = DateTime.UtcNow.AddDays(7),
+            UserId = appUser.Id,
+            DeviceId = deviceId
+        };
+
+        _context.RefreshTokens.Add(refreshToken);
+        await _context.SaveChangesAsync();
+
+        return refreshToken.Token;
     }
 }

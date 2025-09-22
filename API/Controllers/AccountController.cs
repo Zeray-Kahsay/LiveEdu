@@ -34,7 +34,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseContr
 
     }
 
-    [HttpPost("login")]
+    [HttpPost("loginUser")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
         var result = await accountRepository.LoginAsync(loginDto);

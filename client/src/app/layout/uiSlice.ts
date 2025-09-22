@@ -1,10 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export const uiSlice = () => createSlice({
+interface uiState{
+    isLoading: boolean;
+}
+
+const initialState : uiState  = {
+    isLoading: false
+}
+
+export const uiSlice = createSlice({
     name: 'ui',
-    initialState: {
-        isLoading: false,
-    },
+    initialState,       
     reducers: {
         startLoading : (state) => {
             state.isLoading = true;
@@ -15,6 +21,6 @@ export const uiSlice = () => createSlice({
     }
 })
 
-export const { startLoading, stopLoading } = uiSlice().actions;
-export default uiSlice().reducer;
+export const { startLoading, stopLoading } = uiSlice.actions;
+export default uiSlice.reducer;
 

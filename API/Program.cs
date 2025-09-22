@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices();
+builder.Services.AddAuthorization();
 
 
 
@@ -14,7 +15,6 @@ builder.Services.AddIdentityServices();
 var app = builder.Build();
 
 
-app.UseGlobalExceptionHandler(); // Custom global exception handler
 
 
 
@@ -27,7 +27,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(opt =>
+   {
+       opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins([
+           "http://localhost:3000",
+            "https://localhost:3000"
+       ]);
+   });
+app.UseGlobalExceptionHandler(); // Custom global exception handler
+app.UseCors();
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -20,6 +20,7 @@ public static class MigrationExtensions
 
             await context.Database.MigrateAsync();
             await DbInitializer.Initialize(userManager, roleManager);
+            await DbInitializer.SeedCoursesAsync(context, userManager);
 
         }
         catch (Exception ex)

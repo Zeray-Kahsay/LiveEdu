@@ -3,14 +3,12 @@ using API.DTOs.Account.User;
 using API.Entities;
 using API.Helpers;
 using API.Interfaces;
-using API.Services;
 using Microsoft.AspNetCore.Identity;
 
 namespace API.Repositories;
 
 public class AccountRepository(UserManager<AppUser> userManager,
        SignInManager<AppUser> signInManager,
-       //AppDbContext context,
        ITokenService tokenService,
        ILogger<AccountRepository> logger
        ) : IAccountRepository
@@ -20,15 +18,15 @@ public class AccountRepository(UserManager<AppUser> userManager,
         try
         {
 
-            if (await userManager.FindByEmailAsync(registerDto.Email) != null)
-                return Result<UserDto>.Failure("Email is already taken");
+            var existsResult = await UserExistsAsync(registerDto.Email);
+            if (!existsResult.IsSuccess)
+                return Result<UserDto>.Failure(existsResult.Errors!);
 
-            if (await userManager.FindByNameAsync(registerDto.Username) != null)
-                return Result<UserDto>.Failure("Username is already taken");
+
 
             var user = new AppUser
             {
-                UserName = registerDto.Username,
+                UserName = registerDto.Email,
                 Email = registerDto.Email,
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
@@ -42,19 +40,28 @@ public class AccountRepository(UserManager<AppUser> userManager,
                 return Result<UserDto>.Failure(errors);
             }
 
-
+            // Ensure role exists
+            if (!await userManager.IsInRoleAsync(user, registerDto.Role))
+            {
+                var roleExists = await userManager.AddToRoleAsync(user, registerDto.Role);
+                if (!roleExists.Succeeded)
+                {
+                    var errors = roleExists.Errors.Select(e => e.Description).ToArray();
+                    return Result<UserDto>.Failure(errors);
+                }
+            }
             await userManager.AddToRoleAsync(user, registerDto.Role);
 
-            var token = await tokenService.CreateToken(user);
+            //var token = await tokenService.CreateToken(user);
 
             var userDto = new UserDto
             {
                 Id = user.Id,
-                Username = user.UserName,
+                // Username = user.UserName,
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Token = token
+                SchoolName = registerDto.SchoolName,
             };
 
             return Result<UserDto>.Success(userDto);
@@ -81,16 +88,19 @@ public class AccountRepository(UserManager<AppUser> userManager,
             if (!result.Succeeded)
                 return Result<UserDto>.Failure("Invalid email or password");
 
-            var token = await tokenService.CreateToken(user);
+            var token = await tokenService.CreateToken(user, loginDto.DeviceId);
+            var refreshToken = await tokenService.CreateRefreshToken(user, loginDto.DeviceId);
 
             var userDto = new UserDto
             {
                 Id = user.Id,
-                Username = user.UserName,
+                //Username = user.UserName,
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Token = token
+                SchoolName = user.SchoolName,
+                Token = token,
+                RefreshToken = refreshToken
             };
 
             return Result<UserDto>.Success(userDto);
@@ -128,8 +138,10 @@ public class AccountRepository(UserManager<AppUser> userManager,
     {
         try
         {
-            var user = await userManager.FindByEmailAsync(email);
-            return Result<bool>.Success(user != null);
+            if (await userManager.FindByEmailAsync(email) != null)
+                return Result<bool>.Failure("Email is already taken");
+
+            return Result<bool>.Success(false);
 
         }
         catch (Exception ex)

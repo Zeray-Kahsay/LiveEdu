@@ -1,5 +1,3 @@
-using System;
-
 namespace API.Entities;
 
 public class Submission
@@ -16,6 +14,6 @@ public class Submission
     public double? Grade { get; set; }
     public string? Feedback { get; set; }
 
-    
+
 
 }

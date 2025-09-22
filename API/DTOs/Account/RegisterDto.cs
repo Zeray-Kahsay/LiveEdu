@@ -1,11 +1,22 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace API.DTOs.Account;
 
 public record RegisterDto
 {
-    public string Username { get; init; } = default!;
+    [Required]
     public string FirstName { get; init; } = default!;
+    [Required]
     public string LastName { get; init; } = default!;
+    [Required]
     public string Email { get; init; } = default!;
+    [Required]
     public string Password { get; init; } = default!;
-    public string  Role  { get; set; } = default!;
+    [Required]
+    [Compare("Password", ErrorMessage = "Passwords do not match")]
+    public string ConfirmPassword { get; set; } = default!;
+    [Required]
+    public string SchoolName { get; set; } = default!;
+    [Required]
+    public string Role { get; set; } = default!;
 }

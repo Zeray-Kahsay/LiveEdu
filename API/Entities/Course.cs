@@ -10,7 +10,7 @@ public class Course
     public DateTime EndDate { get; set; }
     public int MaxStudents { get; set; }
     public int GradeLevel { get; set; }
-    
+
     public int TeacherId { get; set; }
     public AppUser Teacher { get; set; } = null!;
 
