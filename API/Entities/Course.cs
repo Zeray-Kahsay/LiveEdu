@@ -9,7 +9,8 @@ public class Course
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public int MaxStudents { get; set; }
-    public int GradeLevel { get; set; }
+    public GradeLevel GradeLevel { get; set; }
+    public string Subject { get; set; } = string.Empty;
 
     public int TeacherId { get; set; }
     public AppUser Teacher { get; set; } = null!;
