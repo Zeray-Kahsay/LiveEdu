@@ -21,6 +21,9 @@ public static class ApplicationServiceExtensions
 
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<ICoursesService, CourseService>();
 
         services.AddCors(options =>
         {
