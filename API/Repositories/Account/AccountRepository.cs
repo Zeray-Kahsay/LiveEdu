@@ -3,9 +3,10 @@ using API.DTOs.Account.User;
 using API.Entities;
 using API.Helpers;
 using API.Interfaces;
+using API.Interfaces.Account;
 using Microsoft.AspNetCore.Identity;
 
-namespace API.Repositories;
+namespace API.Repositories.Account;
 
 public class AccountRepository(UserManager<AppUser> userManager,
        SignInManager<AppUser> signInManager,

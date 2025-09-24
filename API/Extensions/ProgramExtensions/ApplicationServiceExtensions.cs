@@ -1,11 +1,15 @@
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using API.Data;
 using API.Interfaces;
+using API.Interfaces.Account;
+using API.Interfaces.CourseEnrollment;
 using API.Repositories;
+using API.Repositories.Account;
+using API.Repositories.CourseEnrollment;
 using API.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace API.Extensions.ProgramExtensions;
 
@@ -24,6 +28,8 @@ public static class ApplicationServiceExtensions
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<ICoursesService, CourseService>();
+        services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+        services.AddScoped<IEnrollmentService, EnrollmentService>();
 
         services.AddCors(options =>
         {

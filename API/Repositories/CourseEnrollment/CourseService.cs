@@ -1,9 +1,9 @@
 using API.DTOs.Course;
 using API.Entities;
 using API.Helpers;
-using API.Interfaces;
+using API.Interfaces.CourseEnrollment;
 
-namespace API.Repositories;
+namespace API.Repositories.CourseEnrollment;
 
 public class CourseService : ICoursesService
 {

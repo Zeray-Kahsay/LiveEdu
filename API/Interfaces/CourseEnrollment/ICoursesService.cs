@@ -2,7 +2,7 @@ using API.DTOs.Course;
 using API.Entities;
 using API.Helpers;
 
-namespace API.Interfaces;
+namespace API.Interfaces.CourseEnrollment;
 
 public interface ICoursesService
 {

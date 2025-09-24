@@ -1,7 +1,6 @@
-using API.Data.Migrations;
 using API.Entities;
 using API.Helpers;
-using API.Interfaces;
+using API.Interfaces.CourseEnrollment;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;

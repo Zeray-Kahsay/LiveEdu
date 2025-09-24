@@ -1,6 +1,6 @@
 using System;
 
-namespace API.Interfaces;
+namespace API.Interfaces.CourseEnrollment;
 
 public interface ISessionRepository
 {

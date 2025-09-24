@@ -1,9 +1,9 @@
 using API.Data;
 using API.Entities;
-using API.Interfaces;
+using API.Interfaces.CourseEnrollment;
 using Microsoft.EntityFrameworkCore;
 
-namespace API.Repositories;
+namespace API.Repositories.CourseEnrollment;
 
 public class CourseRepository : Repository<Course>, ICourseRepository
 {

@@ -22,7 +22,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="text-white font-bold text-lg">
+          <Link to="/"  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg py-2 px-4 rounded shadow-md transition duration-300 font-serif">
             🎓 Your Live Mentor
           </Link>
 
@@ -125,3 +125,8 @@ export default function Navbar() {
     </nav>
   );
 }
+
+
+{/* <Link to="/"  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg py-2 px-4 rounded shadow-md transition duration-300 font-serif">
+            🎓 Your Live Mentor
+</Link> */}

@@ -1,7 +1,6 @@
-using System;
 using API.Entities;
 
-namespace API.Interfaces;
+namespace API.Interfaces.CourseEnrollment;
 
 public interface ICourseRepository : IRepository<Course>
 {

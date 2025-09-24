@@ -1,10 +1,8 @@
 using API.DTOs.Account;
 using API.DTOs.Account.User;
-using API.Entities;
 using API.Helpers;
-using Microsoft.AspNetCore.Identity;
 
-namespace API.Interfaces;
+namespace API.Interfaces.Account;
 
 public interface IAccountRepository
 {
@@ -15,6 +13,6 @@ public interface IAccountRepository
     Task<Result> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     Task<Result> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
     Task<Result<bool>> UserExistsAsync(string email);
-   
+
 
 }

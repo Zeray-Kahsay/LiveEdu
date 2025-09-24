@@ -1,6 +1,6 @@
 using API.DTOs.Account;
 using API.Helpers;
-using API.Interfaces;
+using API.Interfaces.Account;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
