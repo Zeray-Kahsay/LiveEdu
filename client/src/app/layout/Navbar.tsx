@@ -38,7 +38,7 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6 items-center">
-            <Link to="/courseList" className="text-white hover:font-semibold">
+            <Link to="/dashboard" className="text-white hover:font-semibold">
               Courses
             </Link>
             {user ? (
@@ -77,7 +77,7 @@ export default function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-indigo-300 px-4 pt-2 pb-4 space-y-2">
           <Link
-            to="/courseList"
+            to="/dashboard"
             className="block text-white font-medium"
             onClick={toggleMenu}
           >

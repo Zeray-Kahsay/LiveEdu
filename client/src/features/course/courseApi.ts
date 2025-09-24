@@ -11,18 +11,18 @@ export const courseApi = apiSlice.injectEndpoints({
             query: (id) => `/courses/${id}`,
             providesTags: (_result, _error, id) => [{type: "Courses", id}], 
         }),
-        enrollCourse: builder.mutation<void, number>({
-            query: (courseId) => ({
-                url: `/courses/${courseId}/enroll`,
-                method: "POST"
-            }),
-        invalidatesTags: ["Courses"],
-        })
+        // enrollCourse: builder.mutation<void, number>({
+        //     query: (courseId) => ({
+        //         url: `/courses/${courseId}/enroll`,
+        //         method: "POST"
+        //     }),
+        // invalidatesTags: ["Courses"],
+        // })
     }),// endpoints 
 });
 
 export const {
     useGetCoursesQuery, 
     useGetCourseByIdQuery,
-    useEnrollCourseMutation
+    //useEnrollCourseMutation
 } = courseApi;

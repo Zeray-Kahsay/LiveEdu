@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useAppDispatch } from "../../app/store/store";
 import { setCredentials } from "./authSlice";
 import LoadingIndicator from "../../app/layout/LoadingIndicator";
+import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -26,6 +27,7 @@ export default function LoginForm() {
 
   const [loginUser] = useLoginUserMutation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
  
 
   const onSubmit = async (data: LoginInput) => {
@@ -36,6 +38,7 @@ export default function LoginForm() {
       const result = await loginUser({ ...data, deviceId }).unwrap();
        dispatch(setCredentials({
       user: {
+        id: result.id,
         email: result.email,
         firstName: result.firstName,
         lastName: result.lastName,
@@ -46,6 +49,9 @@ export default function LoginForm() {
     }));
 
       reset ();
+
+      navigate("/dashboard");
+      
 
       console.log(result);
       toast.success(`Welcome back, ${result.firstName}!`);

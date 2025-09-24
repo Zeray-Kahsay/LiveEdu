@@ -1,5 +1,6 @@
 using API.DTOs.Course;
 using API.Helpers;
+using API.Interfaces.CourseEnrollment;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -24,7 +25,7 @@ public class EnrollmentsController(IEnrollmentService enrollmentService) : BaseC
     [HttpGet("student/{studentId}")]
     public async Task<IActionResult> GetByStudent(int studentId)
     {
-        var result = await enrollmentService.GetByStudentAsync(studentId);
+        var result = await enrollmentService.GetEnrollmentByStudentAsync(studentId);
 
         if (result.IsSuccess) return Ok(result.Value);
 
