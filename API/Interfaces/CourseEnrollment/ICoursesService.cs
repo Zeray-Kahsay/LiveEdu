@@ -8,5 +8,5 @@ public interface ICoursesService
 {
     Task<Result<IEnumerable<CourseDto>>> GetCoursesAsync();
     Task<Result<CourseDto>> GetCourseByIdAsync(int id);
-    Task<Result<IEnumerable<CourseDto>>> GetByGradeAndSubjectAsync(GradeLevel gradeLevel, string subject);
+    Task<Result<IEnumerable<CourseDto>>> GetByGradeAndSubjectAsync(CourseFilterDto filter);
 }

@@ -8,4 +8,5 @@ public record SessionDto
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public string StreamUrl { get; set; } = default!;
+    public bool IsLive { get; set; }
 }

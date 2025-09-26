@@ -1,9 +1,7 @@
-
 import { apiSlice } from "../../app/api/apiSlice";
 import type { LoginDto } from "../../app/types/account/loginDto";
 import type { RegisterDto } from "../../app/types/account/registerDto";
 import type { UserDto } from "../../app/types/account/userDto";
-
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -29,11 +27,7 @@ export const authApi = apiSlice.injectEndpoints({
       }),
     }),
   }),
-  overrideExisting: true, // ensures hooks are generated even if endpoints already exist
+  overrideExisting: true,
 });
 
-export const {
-  useRegisterUserMutation,
-  useLoginUserMutation,
-  useRefreshTokenMutation,
-} = authApi;
+export const { useRegisterUserMutation, useLoginUserMutation, useRefreshTokenMutation } = authApi;

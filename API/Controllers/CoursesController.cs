@@ -1,3 +1,4 @@
+using API.DTOs.Course;
 using API.Entities;
 using API.Helpers;
 using API.Interfaces.CourseEnrollment;
@@ -38,16 +39,16 @@ public class CoursesController(ICoursesService coursesService) : BaseController
     }
 
     [HttpGet("filter")]
-    public async Task<IActionResult> GetByGradeAndSubject([FromQuery] GradeLevel gradeLevel, [FromQuery] string subject)
+    public async Task<IActionResult> FilterCoursesByGradeAndSubject([FromQuery] CourseFilterDto filter)
     {
-        var result = await coursesService.GetByGradeAndSubjectAsync(gradeLevel, subject);
+        var result = await coursesService.GetByGradeAndSubjectAsync(filter);
 
         if (result.IsSuccess) return Ok(result.Value);
 
-        return StatusCode(500, new ApiErrorDto
+        return NotFound(new ApiErrorDto
         {
-            Status = 500,
-            Message = "Failed to fetch filtered courses",
+            Status = 404,
+            Message = "No courses found",
             Errors = result.Errors
 
         });

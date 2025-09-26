@@ -53,51 +53,53 @@ public static class ApplicationServiceExtensions
                             .Get<JwtSettings>() ?? throw new InvalidOperationException("Jwt settings is missing");
 
         services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-     .AddJwtBearer(options =>
-     {
-         var tokenKey = Encoding.UTF8.GetBytes(jwtSettings.TokenKey);
-
-         // Ensure HTTPS when validating tokens in production and keep the validated token available
-         options.RequireHttpsMetadata = true;
-         options.SaveToken = true;
-
-         options.TokenValidationParameters = new TokenValidationParameters
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+         .AddJwtBearer(options =>
          {
-             ValidateIssuerSigningKey = true,
-             IssuerSigningKey = new SymmetricSecurityKey(tokenKey),
-             ValidateIssuer = !string.IsNullOrEmpty(jwtSettings.Issuer),
-             ValidIssuer = jwtSettings.Issuer,
-             ValidateAudience = !string.IsNullOrEmpty(jwtSettings.Audience),
-             ValidAudience = jwtSettings.Audience,
-             ValidateLifetime = true,
-             // Reduce default clock skew for stricter expiration checks
-             ClockSkew = TimeSpan.Zero
-         };
+             var tokenKey = Encoding.UTF8.GetBytes(jwtSettings.TokenKey);
 
-         options.Events = new JwtBearerEvents
-         {
-             OnMessageReceived = context =>
+             // Ensure HTTPS when validating tokens in production and keep the validated token available
+             options.RequireHttpsMetadata = true;
+             options.SaveToken = true;
+
+             options.TokenValidationParameters = new TokenValidationParameters
              {
-                 var accessToken = context.Request.Query["access_token"].ToString();
+                 ValidateIssuerSigningKey = true,
+                 IssuerSigningKey = new SymmetricSecurityKey(tokenKey),
+                 ValidateIssuer = !string.IsNullOrEmpty(jwtSettings.Issuer),
+                 ValidIssuer = jwtSettings.Issuer,
+                 ValidateAudience = !string.IsNullOrEmpty(jwtSettings.Audience),
+                 ValidAudience = jwtSettings.Audience,
+                 ValidateLifetime = true,
+                 // Reduce default clock skew for stricter expiration checks
+                 ClockSkew = TimeSpan.Zero
+             };
 
-                 // If the request is for the SignalR hub, read the access token from the query string
-                 var path = context.HttpContext.Request.Path;
-                 if (!string.IsNullOrEmpty(accessToken) &&
-                    path.StartsWithSegments("/hubs/message"))
+             options.Events = new JwtBearerEvents
+             {
+                 OnMessageReceived = context =>
                  {
-                     context.Token = accessToken;
+                     var accessToken = context.Request.Query["access_token"].ToString();
+
+                     // If the request is for the SignalR hub, read the access token from the query string
+                     var path = context.HttpContext.Request.Path;
+                     if (!string.IsNullOrEmpty(accessToken) &&
+                        path.StartsWithSegments("/hubs/message"))
+                     {
+                         context.Token = accessToken;
+                     }
+
+                     return Task.CompletedTask;
                  }
-
-                 return Task.CompletedTask;
-             }
-         };
+             };
 
 
-     });
+         });
+
+        services.AddAuthorization();
 
 
 

@@ -5,7 +5,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices();
-builder.Services.AddAuthorization();
+
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .WithOrigins("https://localhost:3000");
+    });
+});
+
 
 
 
@@ -27,15 +41,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(opt =>
-   {
-       opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins([
-           "http://localhost:3000",
-            "https://localhost:3000"
-       ]);
-   });
+// app.UseCors(opt =>
+//    {
+//        opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins([
+//            "http://localhost:3000",
+//             "https://localhost:3000"
+//        ]);
+//    });
 app.UseGlobalExceptionHandler(); // Custom global exception handler
-app.UseCors();
+app.UseCors("CorsPolicy");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -1,13 +1,15 @@
 using API.DTOs.Course;
 using API.Helpers;
 using API.Interfaces.CourseEnrollment;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Authorize]
 public class EnrollmentsController(IEnrollmentService enrollmentService) : BaseController
 {
-    [HttpPost]
+    [HttpPost("enrollCourse")]
     public async Task<IActionResult> Enroll([FromBody] EnrollRequestDto request)
     {
         var result = await enrollmentService.EnrollAsync(request);
@@ -36,4 +38,20 @@ public class EnrollmentsController(IEnrollmentService enrollmentService) : BaseC
             Errors = result.Errors
         });
     }
+
+    [HttpGet("student/{studentId}/course/{courseId}")]
+    public async Task<IActionResult> GetEnrollmentByCourseAndStudent(int studentId, int courseId)
+    {
+        var result = await enrollmentService.GetEnrollmentByCourseAndStudentAsync(courseId, studentId);
+
+        if (result.IsSuccess) return Ok(result.Value);
+
+        return NotFound(new ApiErrorDto
+        {
+            Status = 404,
+            Message = "Not enrolled in this course",
+            Errors = result.Errors
+        });
+    }
+
 }

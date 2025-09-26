@@ -1,4 +1,5 @@
 using API.Data;
+using API.DTOs.Course;
 using API.Entities;
 using API.Interfaces.CourseEnrollment;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +10,12 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 {
     public CourseRepository(AppDbContext context) : base(context) { }
 
-    public async Task<IEnumerable<Course>> GetByGradeAndSubjectAsync(GradeLevel gradeLevel, string subject)
+    public async Task<IEnumerable<Course>> GetByGradeAndSubjectAsync(CourseFilterDto filter)
     {
         return await _context.Courses
                  .Include(c => c.Teacher)
                  .Include(c => c.Sessions)
-                 .Where(c => c.GradeLevel == gradeLevel && c.Subject == subject)
+                 .Where(c => c.GradeLevel == filter.GradeLevel && c.Subject == filter.Subject)
                  .ToListAsync();
     }
 

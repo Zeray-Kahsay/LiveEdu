@@ -70,9 +70,9 @@ public class CourseService : ICoursesService
         return Result<CourseDto>.Success(dto);
     }
 
-    public async Task<Result<IEnumerable<CourseDto>>> GetByGradeAndSubjectAsync(GradeLevel gradeLevel, string subject)
+    public async Task<Result<IEnumerable<CourseDto>>> GetByGradeAndSubjectAsync(CourseFilterDto filter)
     {
-        var courses = await _courseRepository.GetByGradeAndSubjectAsync(gradeLevel, subject);
+        var courses = await _courseRepository.GetByGradeAndSubjectAsync(filter);
 
         var dto = courses.Select(c => new CourseDto
         {

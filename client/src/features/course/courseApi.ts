@@ -11,18 +11,22 @@ export const courseApi = apiSlice.injectEndpoints({
             query: (id) => `/courses/${id}`,
             providesTags: (_result, _error, id) => [{type: "Courses", id}], 
         }),
-        // enrollCourse: builder.mutation<void, number>({
-        //     query: (courseId) => ({
-        //         url: `/courses/${courseId}/enroll`,
-        //         method: "POST"
-        //     }),
-        // invalidatesTags: ["Courses"],
-        // })
+        getCoursesByFilter: builder.query<CourseDto[], {grade?: string; subject?: string}>({
+            query: ({grade, subject}) => {
+                const params = new URLSearchParams();
+                if (grade) params.append("grade", grade);
+                if (subject) params.append("subject", subject);
+                return `/courses/filter?${params.toString()}`
+            },
+            providesTags: ["Courses"]
+        })
+      
     }),// endpoints 
 });
 
 export const {
     useGetCoursesQuery, 
     useGetCourseByIdQuery,
+    useGetCoursesByFilterQuery,
     //useEnrollCourseMutation
 } = courseApi;

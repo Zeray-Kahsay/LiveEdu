@@ -4,13 +4,6 @@ import { baseQueryWithErrorHandling } from "./baseApi";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithErrorHandling,
-  tagTypes: [
-    "User",
-    "Courses",
-    "Enrollments",
-    "ParentStudentLinks",
-    "Assignments",
-    "Submissions",
-  ],
+  tagTypes: ["User", "Courses", "Enrollments", "Assignments", "Submissions"],
   endpoints: () => ({}),
 });

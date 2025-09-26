@@ -3,10 +3,14 @@ import { startLoading, stopLoading } from "../layout/uiSlice";
 import { toast } from "react-toastify";
 
 const customBaseQuery = fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api',
+    baseUrl: 'https://localhost:5001/api',
      prepareHeaders: (headers) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) headers.set('Authorization', `Bearer ${token}`);
+    const authData = localStorage.getItem('auth');
+    if (authData){
+        const parsed = JSON.parse(authData);
+        const token = parsed.accessToken;
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+    }
     return headers;
   },
 });
