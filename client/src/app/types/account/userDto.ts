@@ -4,7 +4,7 @@ export interface UserDto {
   lastName: string;
   email: string;
   schoolName: string;
-  token: string;
+  token?: string;
   roles: string[];
-  refreshToken: string;
+  refreshToken?: string;
 }   

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../store/store";
 
 import { Menu, X } from "lucide-react"; // hamburger and X icons
@@ -22,9 +22,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/"  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg py-2 px-4 rounded shadow-md transition duration-300 font-serif">
+          <NavLink to="/catalog"  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg py-2 px-4 rounded shadow-md transition duration-300 font-serif">
             🎓 Your Live Mentor
-          </Link>
+          </NavLink>
 
           {/* Hamburger for mobile */}
           <div className="flex md:hidden">

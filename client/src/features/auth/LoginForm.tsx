@@ -43,9 +43,10 @@ export default function LoginForm() {
         firstName: result.firstName,
         lastName: result.lastName,
         roles: result.roles || [],
+        schoolName: result.schoolName,
       },
       accessToken: result.token || "",
-      refreshToken: result.refreshToken,
+      refreshToken: result.refreshToken || "",
     }));
 
       reset ();

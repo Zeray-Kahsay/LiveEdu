@@ -1,112 +1,105 @@
-// features/catalog/CourseCatalog.tsx
 import { useState } from "react";
 import LoadingIndicator from "../../app/layout/LoadingIndicator";
 import EmptyState from "../../app/layout/ui/EmptyState";
 import { useAppSelector } from "../../app/store/store";
-import { useGetCoursesByFilterQuery, useGetCoursesQuery } from "../course/courseApi";
+import { useGetCoursesQuery } from "../course/courseApi";
 import CourseCard from "../course/CourseCard";
 import { BookOpen } from "lucide-react";
 
 const grades = [
-  "Grade1","Grade2","Grade3","Grade4","Grade5","Grade6",
-  "Grade7","Grade8","Grade9","Grade10","Grade11","Grade12",
+  "Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6",
+  "Grade7", "Grade8", "Grade9", "Grade10", "Grade11", "Grade12",
 ];
 
 const subjects = ["Math", "English", "Science", "History", "Art", "Music"];
 
 const CourseCatalog = () => {
-  const [selectedGrade, setSelectedGrade] = useState<string | undefined>();
-  const [selectedSubject, setSelectedSubject] = useState<string | undefined>();
-
   const { user } = useAppSelector((state) => state.auth);
   const studentId = user?.id;
 
-  // Queries
-  const {
-    data: filteredCourses,
-    isLoading: filterIsLoading,
-    isError: filterIsError,
-  } = useGetCoursesByFilterQuery(
-    { grade: selectedGrade, subject: selectedSubject },
-    { skip: !selectedGrade && !selectedSubject }
-  );
+  // State for filters and pagination
+  const [selectedGrade, setSelectedGrade] = useState<string | undefined>();
+  const [selectedSubject, setSelectedSubject] = useState<string | undefined>();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [pageNumber, setPageNumber] = useState(1);
 
-  const {
-    data: allCourses,
-    isLoading: allCoursesIsLoading,
-    isError: allCoursesIsError,
-  } = useGetCoursesQuery();
+  const { data, isLoading } = useGetCoursesQuery({
+    pageNumber,
+    pageSize: 6,
+    searchTerm: searchTerm || undefined,
+    gradeLevel: selectedGrade,
+    subject: selectedSubject,
+  });
 
-  // Determine which dataset to show
-  const isFiltering = !!(selectedGrade || selectedSubject);
-  const courses = isFiltering ? filteredCourses : allCourses;
+  console.log(data?.metaData);
 
-  // Loading state
-  if (filterIsLoading || allCoursesIsLoading) {
-    return <LoadingIndicator variant="spinner" size="lg" colorClass="white-text" />;
+  if (isLoading) {
+    return <LoadingIndicator variant="spinner" size="lg" colorClass="white-text" fullPage  />;
   }
 
-  // Empty / error states
-  if (isFiltering && (filterIsError || !filteredCourses?.length)) {
-    return (
-      <EmptyState
-        icon={<BookOpen className="w-12 h-12" />}
-        title="No courses match your filter"
-        description="Try adjusting grade or subject."
-      />
-    );
-  }
-
-  if (!isFiltering && (allCoursesIsError || !allCourses?.length)) {
+  if (!data || data.data.length === 0) {
     return (
       <EmptyState
         icon={<BookOpen className="w-12 h-12" />}
         title="No courses available"
-        description="Please check back later or contact admin."
+        description="Try adjusting your filters or check back later."
       />
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4">
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-600 mb-1">Grade</label>
-          <select
-            value={selectedGrade || ""}
-            onChange={(e) => setSelectedGrade(e.target.value || undefined)}
-            className="rounded-xl border border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          >
-            <option value="">All Grades</option>
-            {grades.map((grade) => (
-              <option key={grade} value={grade}>
-                {grade}
-              </option>
-            ))}
-          </select>
-        </div>
+    <div className="p-4 space-y-6">
+      {/* Search + Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center">
+        <input
+          type="text"
+          placeholder="Search courses..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setPageNumber(1); // reset to page 1
+          }}
+          className="border rounded-xl p-2 shadow-sm focus:ring-2 focus:ring-indigo-400 w-full sm:w-1/3"
+        />
 
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-600 mb-1">Subject</label>
-          <select
-            value={selectedSubject || ""}
-            onChange={(e) => setSelectedSubject(e.target.value || undefined)}
-            className="rounded-xl border border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          >
-            <option value="">All Subjects</option>
-            {subjects.map((subject) => (
-              <option key={subject} value={subject}>
-                {subject}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          value={selectedGrade || ""}
+          onChange={(e) => {
+            setSelectedGrade(e.target.value || undefined);
+            setSelectedSubject(undefined); // reset subject when grade changes
+            setPageNumber(1);
+          }}
+          className="border rounded-xl p-2 shadow-sm focus:ring-2 focus:ring-indigo-400"
+        >
+          <option value="">All Grades</option>
+          {grades.map((grade) => (
+            <option key={grade} value={grade}>
+              {grade}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={selectedSubject || ""}
+          onChange={(e) => {
+            setSelectedSubject(e.target.value || undefined);
+            setPageNumber(1);
+          }}
+          disabled={!selectedGrade} // subjects only after grade chosen
+          className="border rounded-xl p-2 shadow-sm focus:ring-2 focus:ring-indigo-400 disabled:bg-gray-100 disabled:text-gray-400"
+        >
+          <option value="">All Subjects</option>
+          {subjects.map((subject) => (
+            <option key={subject} value={subject}>
+              {subject}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Courses Grid */}
+      {/* Course Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses?.map((course) => (
+        {data.data.map((course) => (
           <CourseCard
             key={course.id}
             id={course.id}
@@ -115,114 +108,35 @@ const CourseCatalog = () => {
             subject={course.subject}
             gradeLevel={course.gradeLevel}
             teacherName={course.teacherName}
-            studentId={studentId!} // user must be logged in
+            studentId={studentId!}
           />
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-4 mt-6">
+        <button
+          disabled={pageNumber === 1}
+          onClick={() => setPageNumber((p) => p - 1)}
+          className="px-3 py-1 rounded-lg bg-indigo-600 text-white disabled:bg-gray-300"
+        >
+          Prev
+        </button>
+
+        <span className="text-gray-700">
+          Page {data.metaData.currentPage} of {data.metaData.totalPages}
+        </span>
+
+        <button
+          disabled={pageNumber === data.metaData.totalPages}
+          onClick={() => setPageNumber((p) => p + 1)}
+          className="px-3 py-1 rounded-lg bg-indigo-600 text-white disabled:bg-gray-300"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
 };
 
 export default CourseCatalog;
-
-
-
-
-
-// // features/catalog/CourseCatalog.tsx
-// import { useState } from "react";
-// import LoadingIndicator from "../../app/layout/LoadingIndicator";
-// import EmptyState from "../../app/layout/ui/EmptyState";
-// import { useAppSelector } from "../../app/store/store";
-// import { useGetCoursesByFilterQuery, useGetCoursesQuery } from "../course/courseApi";
-// import CourseCard from "../course/CourseCard";
-// import { BookOpen } from "lucide-react";
-
-// const CourseCatalog = () => {
-//   const [selectedGrade, setSelectedGrade] = useState<string | undefined>();
-//   const [selectedSubject, setSelectedSubject] = useState<string | undefined>();
-//   const { user } = useAppSelector(state => state.auth);
-//   const studentId = user?.id;
-
-//   const {} = useGetCoursesByFilterQuery({
-//     grade: selectedGrade,
-//     subject: selectedSubject
-//   });
-
-//   const { data: courses, isLoading, isError } = useGetCoursesQuery();
-
-//   if (isLoading) return <LoadingIndicator variant="spinner" size="lg" colorClass="white-text" />;
-
-//   if (isError || !courses || courses.length === 0) {
-//     return (
-//       <EmptyState
-//         icon={<BookOpen className="w-12 h-12" />}
-//         title="No courses available"
-//         description="Please check back later or contact admin."
-//       />
-//     );
-//   }
-
-//   return (
-//     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-//       {courses.map(course => (
-//         <CourseCard
-//           key={course.id}
-//           id={course.id}
-//           title={course.title}
-//           description={course.description}
-//           subject={course.subject}
-//           gradeLevel={course.gradeLevel}
-//           teacherName={course.teacherName}
-//           studentId={studentId!} // studentId is guaranteed because user must be logged in
-//         />
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default CourseCatalog;
-
-
-
-// // import LoadingIndicator from "../../app/layout/LoadingIndicator";
-// // import { useGetCoursesQuery } from "../course/courseApi"
-
-// // const CourseCatalog = () => {
-// //   const {data: courses, isLoading, error} = useGetCoursesQuery();
-
-// //   if (isLoading) return <LoadingIndicator variant="dots" size="lg" colorClass="text-white" />;
-// //   if (error) return <p className="text-center text-red-500">Failed to load courses</p>;
-
-  
-// //   return (
-// //       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-// //       {courses?.map((course) => (
-// //         <div
-// //           key={course.id}
-// //           className="rounded-2xl bg-white shadow-md p-4 hover:shadow-lg transition"
-// //         >
-// //           <h2 className="text-lg font-bold text-indigo-600">{course.title}</h2>
-// //           <p className="text-gray-600">{course.description}</p>
-// //           <p className="mt-2 text-sm font-medium">
-// //             <span className="text-gray-500">Subject:</span> {course.subject}
-// //           </p>
-// //           <p className="text-sm font-medium">
-// //             <span className="text-gray-500">Grade:</span> {course.gradeLevel}
-// //           </p>
-// //           <p className="text-sm font-medium">
-// //             <span className="text-gray-500">Teacher:</span> {course.teacherName}
-// //           </p>
-
-// //           {course.sessions.length > 0 && (
-// //             <div className="mt-2 text-xs text-gray-500">
-// //               <p>📺 Next session: {new Date(course.sessions[0].startTime).toLocaleString()}</p>
-// //             </div>
-// //           )}
-// //         </div>
-// //       ))}
-// //     </div>
-// //   )
-// // }
-
-// // export default CourseCatalog

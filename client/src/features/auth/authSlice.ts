@@ -1,9 +1,9 @@
 
-// authSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { UserDto } from "../../app/types/account/userDto";
 
 interface AuthState {
-  user: { id: number; email: string; firstName: string; lastName: string; roles: string[] } | null;
+  user: UserDto | null;
   accessToken: string | null;
   refreshToken: string | null;
 }

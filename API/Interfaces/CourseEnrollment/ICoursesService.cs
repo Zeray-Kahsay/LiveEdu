@@ -6,7 +6,7 @@ namespace API.Interfaces.CourseEnrollment;
 
 public interface ICoursesService
 {
-    Task<Result<IEnumerable<CourseDto>>> GetCoursesAsync();
+    Task<Result<PagedList<CourseDto>>> GetCoursesAsync(CourseParams courseParams);
     Task<Result<CourseDto>> GetCourseByIdAsync(int id);
     Task<Result<IEnumerable<CourseDto>>> GetByGradeAndSubjectAsync(CourseFilterDto filter);
 }

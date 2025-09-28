@@ -92,8 +92,332 @@ public static class DbInitializer
         if (teacher == null) return;
 
         var courses = new List<Course>
-      {
+       {
         new Course
+       {
+        Title = "Intro to Math",
+        Subject = "Math",
+        GradeLevel = GradeLevel.Grade1,
+        Description = "Fun with numbers!",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Counting Basics",
+                StartTime = DateTime.UtcNow.AddDays(1).AddHours(9),
+                EndTime = DateTime.UtcNow.AddDays(1).AddHours(10),
+                StreamUrl = "https://streamingplatform.com/math/counting",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "Addition Made Easy",
+                StartTime = DateTime.UtcNow.AddDays(3).AddHours(9),
+                EndTime = DateTime.UtcNow.AddDays(3).AddHours(10),
+                StreamUrl = "https://streamingplatform.com/math/addition",
+                IsLive = false
+            }
+        }
+       },
+        new Course
+       {
+        Title = "Advanced Algebra",
+        Subject = "Math",
+        GradeLevel = GradeLevel.Grade8,
+        Description = "Equations and more",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Linear Equations",
+                StartTime = DateTime.UtcNow.AddDays(2).AddHours(11),
+                EndTime = DateTime.UtcNow.AddDays(2).AddHours(12),
+                StreamUrl = "https://streamingplatform.com/algebra/linear",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "Quadratic Equations",
+                StartTime = DateTime.UtcNow.AddDays(4).AddHours(11),
+                EndTime = DateTime.UtcNow.AddDays(4).AddHours(12),
+                StreamUrl = "https://streamingplatform.com/algebra/quadratic",
+                IsLive = false
+            }
+        }
+       },
+       new Course
+       {
+        Title = "Biology Basics",
+        Subject = "Science",
+        GradeLevel = GradeLevel.Grade6,
+        Description = "Introduction to life science",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Introduction to Cells",
+                StartTime = DateTime.UtcNow.AddDays(1).AddHours(14),
+                EndTime = DateTime.UtcNow.AddDays(1).AddHours(16),
+                StreamUrl = "https://streamingplatform.com/biology/cells",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "The Human Body",
+                StartTime = DateTime.UtcNow.AddDays(3).AddHours(14),
+                EndTime = DateTime.UtcNow.AddDays(3).AddHours(16),
+                StreamUrl = "https://streamingplatform.com/biology/body",
+                IsLive = false
+            }
+        }
+       },
+      new Course
+      {
+        Title = "World History",
+        Subject = "History",
+        GradeLevel = GradeLevel.Grade10,
+        Description = "Explore past civilizations",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Ancient Egypt",
+                StartTime = DateTime.UtcNow.AddDays(2).AddHours(10),
+                EndTime = DateTime.UtcNow.AddDays(2).AddHours(11),
+                StreamUrl = "https://streamingplatform.com/history/egypt",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "The Roman Empire",
+                StartTime = DateTime.UtcNow.AddDays(4).AddHours(10),
+                EndTime = DateTime.UtcNow.AddDays(4).AddHours(11),
+                StreamUrl = "https://streamingplatform.com/history/rome",
+                IsLive = false
+            }
+        }
+    },
+    new Course
+       {
+        Title = "Intro to Math",
+        Subject = "Math",
+        GradeLevel = GradeLevel.Grade1,
+        Description = "Fun with numbers!",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Counting Basics",
+                StartTime = DateTime.UtcNow.AddDays(1).AddHours(9),
+                EndTime = DateTime.UtcNow.AddDays(1).AddHours(10),
+                StreamUrl = "https://streamingplatform.com/math/counting",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "Addition Made Easy",
+                StartTime = DateTime.UtcNow.AddDays(3).AddHours(9),
+                EndTime = DateTime.UtcNow.AddDays(3).AddHours(10),
+                StreamUrl = "https://streamingplatform.com/math/addition",
+                IsLive = false
+            }
+        }
+       },
+        new Course
+       {
+        Title = "Advanced Algebra",
+        Subject = "Math",
+        GradeLevel = GradeLevel.Grade8,
+        Description = "Equations and more",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Linear Equations",
+                StartTime = DateTime.UtcNow.AddDays(2).AddHours(11),
+                EndTime = DateTime.UtcNow.AddDays(2).AddHours(12),
+                StreamUrl = "https://streamingplatform.com/algebra/linear",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "Quadratic Equations",
+                StartTime = DateTime.UtcNow.AddDays(4).AddHours(11),
+                EndTime = DateTime.UtcNow.AddDays(4).AddHours(12),
+                StreamUrl = "https://streamingplatform.com/algebra/quadratic",
+                IsLive = false
+            }
+        }
+       },
+       new Course
+       {
+        Title = "Biology Basics",
+        Subject = "Science",
+        GradeLevel = GradeLevel.Grade6,
+        Description = "Introduction to life science",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Introduction to Cells",
+                StartTime = DateTime.UtcNow.AddDays(1).AddHours(14),
+                EndTime = DateTime.UtcNow.AddDays(1).AddHours(16),
+                StreamUrl = "https://streamingplatform.com/biology/cells",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "The Human Body",
+                StartTime = DateTime.UtcNow.AddDays(3).AddHours(14),
+                EndTime = DateTime.UtcNow.AddDays(3).AddHours(16),
+                StreamUrl = "https://streamingplatform.com/biology/body",
+                IsLive = false
+            }
+        }
+       },
+      new Course
+      {
+        Title = "World History",
+        Subject = "History",
+        GradeLevel = GradeLevel.Grade10,
+        Description = "Explore past civilizations",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Ancient Egypt",
+                StartTime = DateTime.UtcNow.AddDays(2).AddHours(10),
+                EndTime = DateTime.UtcNow.AddDays(2).AddHours(11),
+                StreamUrl = "https://streamingplatform.com/history/egypt",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "The Roman Empire",
+                StartTime = DateTime.UtcNow.AddDays(4).AddHours(10),
+                EndTime = DateTime.UtcNow.AddDays(4).AddHours(11),
+                StreamUrl = "https://streamingplatform.com/history/rome",
+                IsLive = false
+            }
+        }
+    },
+    new Course
+       {
+        Title = "Intro to Math",
+        Subject = "Math",
+        GradeLevel = GradeLevel.Grade1,
+        Description = "Fun with numbers!",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Counting Basics",
+                StartTime = DateTime.UtcNow.AddDays(1).AddHours(9),
+                EndTime = DateTime.UtcNow.AddDays(1).AddHours(10),
+                StreamUrl = "https://streamingplatform.com/math/counting",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "Addition Made Easy",
+                StartTime = DateTime.UtcNow.AddDays(3).AddHours(9),
+                EndTime = DateTime.UtcNow.AddDays(3).AddHours(10),
+                StreamUrl = "https://streamingplatform.com/math/addition",
+                IsLive = false
+            }
+        }
+       },
+        new Course
+       {
+        Title = "Advanced Algebra",
+        Subject = "Math",
+        GradeLevel = GradeLevel.Grade8,
+        Description = "Equations and more",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Linear Equations",
+                StartTime = DateTime.UtcNow.AddDays(2).AddHours(11),
+                EndTime = DateTime.UtcNow.AddDays(2).AddHours(12),
+                StreamUrl = "https://streamingplatform.com/algebra/linear",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "Quadratic Equations",
+                StartTime = DateTime.UtcNow.AddDays(4).AddHours(11),
+                EndTime = DateTime.UtcNow.AddDays(4).AddHours(12),
+                StreamUrl = "https://streamingplatform.com/algebra/quadratic",
+                IsLive = false
+            }
+        }
+       },
+       new Course
+       {
+        Title = "Biology Basics",
+        Subject = "Science",
+        GradeLevel = GradeLevel.Grade6,
+        Description = "Introduction to life science",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Introduction to Cells",
+                StartTime = DateTime.UtcNow.AddDays(1).AddHours(14),
+                EndTime = DateTime.UtcNow.AddDays(1).AddHours(16),
+                StreamUrl = "https://streamingplatform.com/biology/cells",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "The Human Body",
+                StartTime = DateTime.UtcNow.AddDays(3).AddHours(14),
+                EndTime = DateTime.UtcNow.AddDays(3).AddHours(16),
+                StreamUrl = "https://streamingplatform.com/biology/body",
+                IsLive = false
+            }
+        }
+       },
+      new Course
+      {
+        Title = "World History",
+        Subject = "History",
+        GradeLevel = GradeLevel.Grade10,
+        Description = "Explore past civilizations",
+        TeacherId = teacher.Id,
+        Sessions = new List<Session>
+        {
+            new Session
+            {
+                Title = "Ancient Egypt",
+                StartTime = DateTime.UtcNow.AddDays(2).AddHours(10),
+                EndTime = DateTime.UtcNow.AddDays(2).AddHours(11),
+                StreamUrl = "https://streamingplatform.com/history/egypt",
+                IsLive = false
+            },
+            new Session
+            {
+                Title = "The Roman Empire",
+                StartTime = DateTime.UtcNow.AddDays(4).AddHours(10),
+                EndTime = DateTime.UtcNow.AddDays(4).AddHours(11),
+                StreamUrl = "https://streamingplatform.com/history/rome",
+                IsLive = false
+            }
+        }
+    },
+    new Course
        {
         Title = "Intro to Math",
         Subject = "Math",

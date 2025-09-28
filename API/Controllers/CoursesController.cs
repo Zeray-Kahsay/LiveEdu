@@ -1,5 +1,5 @@
+using System.Text.Json;
 using API.DTOs.Course;
-using API.Entities;
 using API.Helpers;
 using API.Interfaces.CourseEnrollment;
 using Microsoft.AspNetCore.Mvc;
@@ -9,18 +9,18 @@ namespace API.Controllers;
 public class CoursesController(ICoursesService coursesService) : BaseController
 {
     [HttpGet]
-    public async Task<IActionResult> GetCourses()
+    public async Task<ActionResult<PagedList<CourseDto>>> GetCourses([FromQuery] CourseParams courseParams)
     {
-        var result = await coursesService.GetCoursesAsync();
+        var result = await coursesService.GetCoursesAsync(courseParams);
 
-        if (result.IsSuccess) return Ok(result.Value);
+        if (!result.IsSuccess)
+            return BadRequest(result.Errors);
 
-        return StatusCode(500, new ApiErrorDto
-        {
-            Status = 500,
-            Message = "Failed to fetch courses",
-            Errors = result.Errors
-        });
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(result.Value?.MetaData));
+
+        return Ok(result.Value);
+
+
     }
 
     [HttpGet("{id}")]

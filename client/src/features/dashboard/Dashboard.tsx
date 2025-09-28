@@ -11,7 +11,7 @@ const Dashboard = () => {
     const {data: enrollments, isLoading} = useGetStudentEnrollmentsQuery(studentId);
     const navigate = useNavigate();
 
-    if (isLoading) return <LoadingIndicator variant="spinner" size="lg" colorClass="white-text" /> 
+    if (isLoading) return <LoadingIndicator variant="spinner" size="lg" colorClass="white-text" fullPage /> 
     if (!enrollments || enrollments.length === 0){
       return (
         <EmptyState

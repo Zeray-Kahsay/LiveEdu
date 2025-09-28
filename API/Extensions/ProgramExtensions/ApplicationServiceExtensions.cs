@@ -10,6 +10,7 @@ using API.Repositories;
 using API.Repositories.Account;
 using API.Repositories.CourseEnrollment;
 using API.Services;
+using System.Text.Json.Serialization;
 
 namespace API.Extensions.ProgramExtensions;
 
@@ -18,7 +19,11 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
         // Add application services here
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(opt =>
+            {
+                opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
         services.AddEndpointsApiExplorer();
         services.AddOpenApi();
         services.AddSwaggerGen();

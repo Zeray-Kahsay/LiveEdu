@@ -16,7 +16,7 @@ const CourseDetails = () => {
   const {data: enrollment, isLoading: enrollmentLoading} = useGetEnrollmentByCourseAndStudentQuery({courseId, studentId});
 
   if (courseLoading || enrollmentLoading){
-    return <LoadingIndicator variant = "spinner" size="lg" colorClass="white-text" />
+    return <LoadingIndicator variant = "spinner" size="lg" colorClass="white-text"fullPage />
   }
 
 
