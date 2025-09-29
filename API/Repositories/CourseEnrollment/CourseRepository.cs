@@ -50,7 +50,7 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
     }
 
-    public async Task<PagedList<Course>> GetCoursesAsync(CourseParams courseParams)
+    public async Task<List<Course>> GetCoursesAsync(CourseParams courseParams)
     {
         var query = _context.Courses
             .Include(c => c.Teacher)
@@ -60,15 +60,16 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         // Searching
         if (!string.IsNullOrEmpty(courseParams.SearchTerm))
         {
+            //var term = courseParams.SearchTerm.ToLower();
             query = query.Where(c =>
-               c.Title.Contains(courseParams.SearchTerm) ||
-               c.Subject.Contains(courseParams.SearchTerm));
+               c.Title.Contains(courseParams.SearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+               c.Subject.Contains(courseParams.SearchTerm, StringComparison.CurrentCultureIgnoreCase));
         }
 
         // Filter by grade
-        if (Enum.IsDefined(typeof(GradeLevel), courseParams.GradeLevel) && courseParams.GradeLevel != 0)
+        if (courseParams.GradeLevel.HasValue)
         {
-            query = query.Where(c => c.GradeLevel == courseParams.GradeLevel);
+            query = query.Where(c => c.GradeLevel == courseParams.GradeLevel.Value);
         }
 
         // Filtering by subject
@@ -77,6 +78,18 @@ public class CourseRepository : Repository<Course>, ICourseRepository
             query = query.Where(c => c.Subject == courseParams.Subject);
         }
 
-        return await PagedList<Course>.ToPagedList(query, courseParams.PageNumber, courseParams.PageSize);
+        // cursor condition
+        if (courseParams.LastId.HasValue)
+        {
+            query = query.Where(c => c.CourseId > courseParams.LastId.Value);
+        }
+
+        // Fetch +1 for 'has next'
+        var items = await query
+                 .OrderBy(c => c.CourseId)
+                 .Take(courseParams.PageSize + 1)
+                 .ToListAsync();
+
+        return items;
     }
 }

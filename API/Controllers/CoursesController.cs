@@ -8,18 +8,15 @@ namespace API.Controllers;
 
 public class CoursesController(ICoursesService coursesService) : BaseController
 {
-    [HttpGet]
-    public async Task<ActionResult<PagedList<CourseDto>>> GetCourses([FromQuery] CourseParams courseParams)
+    [HttpGet("getCourses")]
+    public async Task<ActionResult> GetCourses([FromQuery] CourseParams courseParams)
     {
         var result = await coursesService.GetCoursesAsync(courseParams);
 
         if (!result.IsSuccess)
             return BadRequest(result.Errors);
 
-        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(result.Value?.MetaData));
-
         return Ok(result.Value);
-
 
     }
 

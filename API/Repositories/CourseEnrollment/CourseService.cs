@@ -2,6 +2,7 @@ using API.DTOs.Course;
 using API.Entities;
 using API.Helpers;
 using API.Interfaces.CourseEnrollment;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 
 namespace API.Repositories.CourseEnrollment;
 
@@ -14,32 +15,32 @@ public class CourseService : ICoursesService
         _courseRepository = courseRepository;
     }
 
-    public async Task<Result<IEnumerable<CourseDto>>> GetCoursesAsync()
-    {
-        var courses = await _courseRepository.GetAllWithDetailsAsync();
+    // public async Task<Result<IEnumerable<CourseDto>>> GetCoursesAsync()
+    // {
+    //     var courses = await _courseRepository.GetAllWithDetailsAsync();
 
-        var dto = courses.Select(c => new CourseDto
-        {
-            Id = c.CourseId,
-            Title = c.Title,
-            Subject = c.Subject,
-            GradeLevel = c.GradeLevel.ToString(),
-            Description = c.Description,
-            TeacherName = c.Teacher != null
-                ? $"{c.Teacher.FirstName} {c.Teacher.LastName}"
-                : "Unknown Teacher",
-            Sessions = c.Sessions.Select(s => new SessionDto
-            {
-                SessionId = s.SessionId,
-                Title = s.Title,
-                StartTime = s.StartTime,
-                EndTime = s.EndTime,
-                StreamUrl = s.StreamUrl
-            }).ToList()
-        });
+    //     var dto = courses.Select(c => new CourseDto
+    //     {
+    //         Id = c.CourseId,
+    //         Title = c.Title,
+    //         Subject = c.Subject,
+    //         GradeLevel = c.GradeLevel.ToString(),
+    //         Description = c.Description,
+    //         TeacherName = c.Teacher != null
+    //             ? $"{c.Teacher.FirstName} {c.Teacher.LastName}"
+    //             : "Unknown Teacher",
+    //         Sessions = c.Sessions.Select(s => new SessionDto
+    //         {
+    //             SessionId = s.SessionId,
+    //             Title = s.Title,
+    //             StartTime = s.StartTime,
+    //             EndTime = s.EndTime,
+    //             StreamUrl = s.StreamUrl
+    //         }).ToList()
+    //     });
 
-        return Result<IEnumerable<CourseDto>>.Success(dto);
-    }
+    //     return Result<IEnumerable<CourseDto>>.Success(dto);
+    // }
 
     public async Task<Result<CourseDto>> GetCourseByIdAsync(int id)
     {
@@ -97,7 +98,7 @@ public class CourseService : ICoursesService
         return Result<IEnumerable<CourseDto>>.Success(dto);
     }
 
-    public async Task<Result<PagedList<CourseDto>>> GetCoursesAsync(CourseParams courseParams)
+    public async Task<Result<CoursePageDto>> GetCoursesAsync(CourseParams courseParams)
     {
         var courses = await _courseRepository.GetCoursesAsync(courseParams);
 
@@ -121,16 +122,20 @@ public class CourseService : ICoursesService
             }).ToList()
         }).ToList();
 
-        var pagedList = new PagedList<CourseDto>(
-       dtoList,
-       courses.MetaData.TotalCount,
-       courses.MetaData.CurrentPage,
-       courses.MetaData.PageSize
-   );
+        var hasNextPage = courses.Count > courseParams.PageSize;
+        var lastId = dtoList.LastOrDefault()?.Id;
 
-        // Always success, even if dtoList is empty
-        return Result<PagedList<CourseDto>>.Success(pagedList);
+        var response = new CoursePageDto
+        {
+            Courses = dtoList,
+            HasNextPage = hasNextPage,
+            LastId = lastId
+        };
+
+        return Result<CoursePageDto>.Success(response);
     }
+
+
 }
 
 

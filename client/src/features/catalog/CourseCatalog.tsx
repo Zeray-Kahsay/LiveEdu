@@ -1,10 +1,10 @@
 import { useState } from "react";
-import LoadingIndicator from "../../app/layout/LoadingIndicator";
-import EmptyState from "../../app/layout/ui/EmptyState";
 import { useAppSelector } from "../../app/store/store";
 import { useGetCoursesQuery } from "../course/courseApi";
-import CourseCard from "../course/CourseCard";
+import LoadingIndicator from "../../app/layout/LoadingIndicator";
+import EmptyState from "../../app/layout/ui/EmptyState";
 import { BookOpen } from "lucide-react";
+import CourseCard from "../course/CourseCard";
 
 const grades = [
   "Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6",
@@ -13,61 +13,74 @@ const grades = [
 
 const subjects = ["Math", "English", "Science", "History", "Art", "Music"];
 
-const CourseCatalog = () => {
-  const { user } = useAppSelector((state) => state.auth);
+ const CourseCatalog = () => {
+  const { user } = useAppSelector((s) => s.auth);
   const studentId = user?.id;
 
-  // State for filters and pagination
-  const [selectedGrade, setSelectedGrade] = useState<string | undefined>();
-  const [selectedSubject, setSelectedSubject] = useState<string | undefined>();
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [pageNumber, setPageNumber] = useState(1);
-
-  const { data, isLoading } = useGetCoursesQuery({
-    pageNumber,
-    pageSize: 6,
-    searchTerm: searchTerm || undefined,
-    gradeLevel: selectedGrade,
-    subject: selectedSubject,
+  const [filters, setFilters] = useState({
+    searchTerm: "",
+    gradeLevel: "",
+    subject: ""
   });
 
-  console.log(data?.metaData);
+  const [lastId, setLastId] = useState<number | undefined>();
+
+  const { data, isLoading } = useGetCoursesQuery({
+    pageSize: 6,
+    lastId,
+    searchTerm: filters.searchTerm,
+    gradeLevel: filters.gradeLevel,
+    subject: filters.subject
+  });
+
+  console.log("Courses: ", data?.courses);
+
+  const handleNext = () => {
+    if (data?.hasNextPage && data?.lastId) {
+      setLastId(data.lastId);
+    }
+  };
+
+  const handleReset = () => setLastId(undefined);
 
   if (isLoading) {
-    return <LoadingIndicator variant="spinner" size="lg" colorClass="white-text" fullPage  />;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <LoadingIndicator variant="spinner" size="lg" colorClass="text-indigo-600" />
+      </div>
+    );
   }
 
-  if (!data || data.data.length === 0) {
+  if (!data || data.courses?.length === 0) {
     return (
       <EmptyState
-        icon={<BookOpen className="w-12 h-12" />}
+        icon={<BookOpen className="w-12 h-12 text-indigo-500" />}
         title="No courses available"
-        description="Try adjusting your filters or check back later."
+        description="Try adjusting your filters or search for something else."
       />
     );
   }
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-6 space-y-8">
       {/* Search + Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center">
+      <div className="flex flex-col sm:flex-row gap-4">
         <input
           type="text"
           placeholder="Search courses..."
-          value={searchTerm}
+          value={filters.searchTerm}
           onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setPageNumber(1); // reset to page 1
+            setFilters({ ...filters, searchTerm: e.target.value });
+            setLastId(undefined);
           }}
-          className="border rounded-xl p-2 shadow-sm focus:ring-2 focus:ring-indigo-400 w-full sm:w-1/3"
+          className="flex-1 border rounded-xl p-2 shadow-sm focus:ring-2 focus:ring-indigo-400"
         />
 
         <select
-          value={selectedGrade || ""}
+          value={filters.gradeLevel}
           onChange={(e) => {
-            setSelectedGrade(e.target.value || undefined);
-            setSelectedSubject(undefined); // reset subject when grade changes
-            setPageNumber(1);
+            setFilters({ ...filters, gradeLevel: e.target.value });
+            setLastId(undefined);
           }}
           className="border rounded-xl p-2 shadow-sm focus:ring-2 focus:ring-indigo-400"
         >
@@ -80,13 +93,12 @@ const CourseCatalog = () => {
         </select>
 
         <select
-          value={selectedSubject || ""}
+          value={filters.subject}
           onChange={(e) => {
-            setSelectedSubject(e.target.value || undefined);
-            setPageNumber(1);
+            setFilters({ ...filters, subject: e.target.value });
+            setLastId(undefined);
           }}
-          disabled={!selectedGrade} // subjects only after grade chosen
-          className="border rounded-xl p-2 shadow-sm focus:ring-2 focus:ring-indigo-400 disabled:bg-gray-100 disabled:text-gray-400"
+          className="border rounded-xl p-2 shadow-sm focus:ring-2 focus:ring-indigo-400"
         >
           <option value="">All Subjects</option>
           {subjects.map((subject) => (
@@ -99,40 +111,26 @@ const CourseCatalog = () => {
 
       {/* Course Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data.data.map((course) => (
-          <CourseCard
-            key={course.id}
-            id={course.id}
-            title={course.title}
-            description={course.description}
-            subject={course.subject}
-            gradeLevel={course.gradeLevel}
-            teacherName={course.teacherName}
-            studentId={studentId!}
-          />
+        {data.courses?.map((course) => (
+          <CourseCard key={course.id} {...course} studentId={studentId!} />
         ))}
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center items-center gap-4 mt-6">
+      <div className="flex justify-between mt-6">
         <button
-          disabled={pageNumber === 1}
-          onClick={() => setPageNumber((p) => p - 1)}
-          className="px-3 py-1 rounded-lg bg-indigo-600 text-white disabled:bg-gray-300"
+          onClick={handleReset}
+          className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300 transition disabled:opacity-50"
+          disabled={!lastId}
         >
-          Prev
+          Reset
         </button>
-
-        <span className="text-gray-700">
-          Page {data.metaData.currentPage} of {data.metaData.totalPages}
-        </span>
-
         <button
-          disabled={pageNumber === data.metaData.totalPages}
-          onClick={() => setPageNumber((p) => p + 1)}
-          className="px-3 py-1 rounded-lg bg-indigo-600 text-white disabled:bg-gray-300"
+          onClick={handleNext}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition disabled:opacity-50"
+          disabled={!data.hasNextPage}
         >
-          Next
+          Next →
         </button>
       </div>
     </div>
