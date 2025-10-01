@@ -1,4 +1,5 @@
 using API.DTOs.Account;
+using API.DTOs.Account.User;
 using API.Helpers;
 using API.Interfaces.Account;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +57,17 @@ public class AccountController(IAccountRepository accountRepository) : BaseContr
             Errors = errors
         };
         return StatusCode(status, errorResponse);
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto dto)
+    {
+        var result = await accountRepository.RefreshTokenAsync(dto);
+
+        if (!result.IsSuccess)
+            return Unauthorized(result.Errors);
+
+        return Ok(result.Value);
     }
 
 }

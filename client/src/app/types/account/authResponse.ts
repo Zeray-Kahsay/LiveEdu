@@ -1,7 +1,7 @@
 import type { UserDto } from "./userDto";
 
 export interface AuthResponse {
-  user: UserDto | null;
+  user: UserDto;
   accessToken: string;
   refreshToken: string;
 }

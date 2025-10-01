@@ -1,9 +1,9 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithErrorHandling } from "./baseApi";
+import { baseQueryWithReauthAndErrorHandling } from "./baseApi";
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: baseQueryWithErrorHandling,
+  baseQuery: baseQueryWithReauthAndErrorHandling,
   tagTypes: ["User", "Courses", "Enrollments", "Assignments", "Submissions"],
   endpoints: () => ({}),
 });

@@ -80,40 +80,45 @@ public class AccountRepository(UserManager<AppUser> userManager,
     }
 
 
-    public async Task<Result<UserDto>> LoginAsync(LoginDto loginDto)
+    public async Task<Result<AuthResponseDto>> LoginAsync(LoginDto loginDto)
     {
         try
         {
             var user = await userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
-                return Result<UserDto>.Failure("Invalid email or password");
+                return Result<AuthResponseDto>.Failure("Invalid email or password");
 
             var result = await signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
             if (!result.Succeeded)
-                return Result<UserDto>.Failure("Invalid email or password");
+                return Result<AuthResponseDto>.Failure("Invalid email or password");
 
-            var token = await tokenService.CreateToken(user, loginDto.DeviceId);
+            var accessToken = await tokenService.CreateToken(user, loginDto.DeviceId);
             var refreshToken = await tokenService.CreateRefreshToken(user, loginDto.DeviceId);
 
-            var userDto = new UserDto
+            var response = new AuthResponseDto
             {
-                Id = user.Id,
-                //Username = user.UserName,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                SchoolName = user.SchoolName,
-                Token = token,
-                RefreshToken = refreshToken
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.Token,
+                User = new UserDto
+                {
+                    Id = user.Id,
+                    //Username = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    SchoolName = user.SchoolName,
+                }
             };
 
-            return Result<UserDto>.Success(userDto);
+
+
+            return Result<AuthResponseDto>.Success(response);
 
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error occurred during user login");
-            return Result<UserDto>.Failure("An Internal error occurred during login. Please try again later.");
+            return Result<AuthResponseDto>.Failure("An Internal error occurred during login. Please try again later.");
         }
 
     }
@@ -156,33 +161,56 @@ public class AccountRepository(UserManager<AppUser> userManager,
 
     }
 
-    public async Task<Result<AuthResponseDto>> RefreshTokenAsync(AppUser ur, string deviceId)
+    public async Task<Result<AuthResponseDto>> RefreshTokenAsync(RefreshTokenRequestDto dto)
     {
-        var user = await context.Users
-                .Include(u => u.RefreshTokens)
-                .FirstOrDefaultAsync(u => u.RefreshTokens.Any(rt => rt.Token == dto.RefreshToken));
-
-        if (user is null)
-            return Result<AuthResponseDto>.Failure("Invalid refresh token");
-
-        var rt = user.RefreshTokens.First(rt => rt.Token == dto.RefreshToken);
-
-        if (rt.IsRevoked)
-            return Result<AuthResponseDto>.Failure("Expired or revoked refresh token");
-
-        // Generate new access token
-        var newAccessToken = await tokenService.CreateRefreshToken(user, dto.DeviceId);
-
-        // Generate new refresh token and revoke old one
-        var newRefreshToken = await tokenService.CreateToken(user, dto.DeviceId);
-
-        await context.SaveChangesAsync();
-
-        return Result<AuthResponseDto>.Success(new AuthResponseDto
+        try
         {
-            AccessToken = newAccessToken,
-            RefreshToken = newRefreshToken.Token
+            // lookup refresh token in DB
+            var storedToken = await context.RefreshTokens
+                                .Include(rt => rt.User)
+                                .FirstOrDefaultAsync(rt => rt.Token == dto.RefreshToken && rt.DeviceId == dto.DeviceId);
 
-        });
+            if (storedToken is null || storedToken.IsRevoked || storedToken.Expires < DateTime.UtcNow)
+                return Result<AuthResponseDto>.Failure("Invalid or expired refresh token");
+
+
+            var appUser = storedToken.User;
+            if (appUser is null)
+                return Result<AuthResponseDto>.Failure("User not found");
+
+            // Generate new tokens
+            var newAccessToken = await tokenService.CreateToken(appUser, dto.DeviceId);
+            var newRefreshToken = await tokenService.CreateRefreshToken(appUser, dto.DeviceId);
+
+            // Revoke the old token
+            storedToken.IsRevoked = true;
+            await context.SaveChangesAsync();
+
+            var response = new AuthResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken.Token,
+                User = new UserDto
+                {
+                    Id = appUser.Id,
+                    Email = appUser.Email,
+                    FirstName = appUser.FirstName,
+                    LastName = appUser.LastName,
+                    SchoolName = appUser.SchoolName
+                }
+            };
+
+            return Result<AuthResponseDto>.Success(response);
+
+        }
+        catch (Exception ex)
+        {
+
+            logger.LogError(ex, "Error refreshing token");
+            return Result<AuthResponseDto>.Failure("An internal error occurred while refreshing token");
+        }
+
+
     }
+
 }

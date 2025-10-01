@@ -4,8 +4,6 @@ import { z } from "zod";
 import { FiMail, FiLock } from "react-icons/fi";
 import { useLoginUserMutation } from "./authApi";
 import { toast } from "react-toastify";
-import { useAppDispatch } from "../../app/store/store";
-import { setCredentials } from "./authSlice";
 import LoadingIndicator from "../../app/layout/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
 
@@ -26,44 +24,43 @@ export default function LoginForm() {
   });
 
   const [loginUser] = useLoginUserMutation();
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
- 
 
   const onSubmit = async (data: LoginInput) => {
-    try {
-      const deviceId = localStorage.getItem("deviceId") ?? crypto.randomUUID();
-      localStorage.setItem("deviceId", deviceId);
+  try {
+    const deviceId = localStorage.getItem("deviceId") ?? crypto.randomUUID();
+    localStorage.setItem("deviceId", deviceId);
 
-      const result = await loginUser({ ...data, deviceId }).unwrap();
-       dispatch(setCredentials({
-      user: {
-        id: result.id,
-        email: result.email,
-        firstName: result.firstName,
-        lastName: result.lastName,
-        roles: result.roles || [],
-        schoolName: result.schoolName,
-      },
-      accessToken: result.token || "",
-      refreshToken: result.refreshToken || "",
-    }));
+    const result = await loginUser({ ...data, deviceId }).unwrap();
 
-      reset ();
+    // result is AuthResponse: { accessToken, refreshToken, user }  // THIS IS DONE INSIDE authApi.ts
+    // dispatch(setCredentials({
+    //   user: {
+    //     id: result.user.id,
+    //     email: result.user.email,
+    //     firstName: result.user.firstName,
+    //     lastName: result.user.lastName,
+    //     roles: result.user.roles || [],
+    //     schoolName: result.user.schoolName,
+    //   },
+    //   accessToken: result.accessToken,
+    //   refreshToken: result.refreshToken,
+    // }));
 
-      navigate("/dashboard");
-      
+    // localStorage.setItem("auth", JSON.stringify(result));
 
-      console.log(result);
-      toast.success(`Welcome back, ${result.firstName}!`);
-    } catch (err: any) {
-      if (err.data?.errors){
-        toast.error(err?.data?.errors?.join(", "));
-      } else {
-        toast.error("Login failed. Please try again")
-      }
+    reset();
+    navigate("/dashboard");
+
+    toast.success(`Welcome back, ${result.user.firstName}!`);
+  } catch (err: any) {
+    if (err.data?.errors) {
+      toast.error(err.data.errors.join(", "));
+    } else {
+      toast.error("Login failed. Please try again");
     }
-  };
+  }
+};
 
   return (
     <div className="max-w-md mx-auto mt-6 bg-white p-8 rounded-2xl shadow-lg">

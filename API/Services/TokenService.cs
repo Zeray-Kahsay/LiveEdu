@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using API.Data;
+using API.DTOs.Account.User;
 using API.Entities;
 using API.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -70,7 +71,7 @@ public class TokenService : ITokenService
     }
 
 
-    public async Task<string> CreateRefreshToken(AppUser appUser, string deviceId)
+    public async Task<RefreshToken> CreateRefreshToken(AppUser appUser, string deviceId)
     {
         var refreshToken = new RefreshToken
         {
@@ -83,6 +84,32 @@ public class TokenService : ITokenService
         _context.RefreshTokens.Add(refreshToken);
         await _context.SaveChangesAsync();
 
-        return refreshToken.Token;
+        return refreshToken;
+    }
+
+    public async Task<AuthResponseDto> GenerateAuthResponse(AppUser user, string deviceId)
+    {
+        var accessToken = await CreateToken(user, deviceId);
+        var refreshToken = await CreateRefreshToken(user, deviceId);
+
+        var userDto = new UserDto
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            SchoolName = user.SchoolName,
+            Roles = (await _userManager.GetRolesAsync(user)).ToList(),
+            Token = accessToken,
+            RefreshToken = refreshToken.Token
+        };
+
+        return new AuthResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken.Token,
+            User = userDto
+        };
+
     }
 }
