@@ -10,11 +10,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    
+  <StrictMode>    
     <Provider store={store}>
       <ToastContainer position="top-right" hideProgressBar theme="colored" />
- <RouterProvider router={router} />
+        <RouterProvider router={router} />
     </Provider>
   </StrictMode>,
 )

@@ -1,3 +1,4 @@
+using API.Data;
 using API.DTOs.Account;
 using API.DTOs.Account.User;
 using API.Entities;
@@ -5,12 +6,14 @@ using API.Helpers;
 using API.Interfaces;
 using API.Interfaces.Account;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Repositories.Account;
 
 public class AccountRepository(UserManager<AppUser> userManager,
        SignInManager<AppUser> signInManager,
        ITokenService tokenService,
+       AppDbContext context,
        ILogger<AccountRepository> logger
        ) : IAccountRepository
 {
@@ -151,5 +154,35 @@ public class AccountRepository(UserManager<AppUser> userManager,
             return Result<bool>.Failure("An internal error occurred. Please try again later.");
         }
 
+    }
+
+    public async Task<Result<AuthResponseDto>> RefreshTokenAsync(AppUser ur, string deviceId)
+    {
+        var user = await context.Users
+                .Include(u => u.RefreshTokens)
+                .FirstOrDefaultAsync(u => u.RefreshTokens.Any(rt => rt.Token == dto.RefreshToken));
+
+        if (user is null)
+            return Result<AuthResponseDto>.Failure("Invalid refresh token");
+
+        var rt = user.RefreshTokens.First(rt => rt.Token == dto.RefreshToken);
+
+        if (rt.IsRevoked)
+            return Result<AuthResponseDto>.Failure("Expired or revoked refresh token");
+
+        // Generate new access token
+        var newAccessToken = await tokenService.CreateRefreshToken(user, dto.DeviceId);
+
+        // Generate new refresh token and revoke old one
+        var newRefreshToken = await tokenService.CreateToken(user, dto.DeviceId);
+
+        await context.SaveChangesAsync();
+
+        return Result<AuthResponseDto>.Success(new AuthResponseDto
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken.Token
+
+        });
     }
 }

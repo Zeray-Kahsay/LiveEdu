@@ -38,7 +38,7 @@ export const baseQueryWithReauth: typeof customBaseQuery = async (args, api, ext
       );
 
       if (refreshResult.data) {
-        // 👇 tell TS that it’s AuthResponse
+        //  tell TS that it’s AuthResponse
         const authData = refreshResult.data as AuthResponse;
         api.dispatch(setCredentials(authData));
 

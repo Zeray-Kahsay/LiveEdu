@@ -1,5 +1,6 @@
 using API.DTOs.Account;
 using API.DTOs.Account.User;
+using API.Entities;
 using API.Helpers;
 
 namespace API.Interfaces.Account;
@@ -12,6 +13,7 @@ public interface IAccountRepository
     Task<Result<string>?> GenerateEmailConfirmationTokenAsync(string email);
     Task<Result> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     Task<Result> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
+    Task<Result<AuthResponseDto>> RefreshTokenAsync(AppUser user, string DeviceId);
     Task<Result<bool>> UserExistsAsync(string email);
 
 

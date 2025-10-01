@@ -23,7 +23,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <NavLink to="/catalog"  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg py-2 px-4 rounded shadow-md transition duration-300 font-serif">
-            🎓 Your Live Mentor
+            🎓 Your Live Tutor
           </NavLink>
 
           {/* Hamburger for mobile */}

@@ -16,5 +16,6 @@ public class AppUser : IdentityUser<int>
     // Link to parents if student
     public ICollection<ParentStudentLink> ParentLinks { get; set; } = [];
     public ICollection<AppUserRole> UserRoles { get; set; } = [];
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 
 }

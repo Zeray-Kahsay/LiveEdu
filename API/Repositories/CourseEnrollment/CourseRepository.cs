@@ -60,10 +60,13 @@ public class CourseRepository : Repository<Course>, ICourseRepository
         // Searching
         if (!string.IsNullOrEmpty(courseParams.SearchTerm))
         {
-            //var term = courseParams.SearchTerm.ToLower();
             query = query.Where(c =>
-               c.Title.Contains(courseParams.SearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-               c.Subject.Contains(courseParams.SearchTerm, StringComparison.CurrentCultureIgnoreCase));
+               EF.Functions.Like(c.Title, $"%{courseParams.SearchTerm}%") ||
+               EF.Functions.Like(c.Subject, $"%{courseParams.SearchTerm}%"));
+            //var term = courseParams.SearchTerm.ToLower();
+            // query = query.Where(c =>
+            //    c.Description.Contains(term) ||
+            //    c.Subject.Contains(term));
         }
 
         // Filter by grade
