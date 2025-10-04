@@ -1,8 +1,6 @@
 using API.DTOs.Course;
-using API.Entities;
 using API.Helpers;
 using API.Interfaces.CourseEnrollment;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 
 namespace API.Repositories.CourseEnrollment;
 
@@ -55,6 +53,7 @@ public class CourseService : ICoursesService
             Subject = course.Subject,
             GradeLevel = course.GradeLevel.ToString(),
             Description = course.Description,
+            Price = course.Price,
             TeacherName = course.Teacher != null
                 ? $"{course.Teacher.FirstName} {course.Teacher.LastName}"
                 : "Unknown Teacher",
@@ -82,6 +81,7 @@ public class CourseService : ICoursesService
             Subject = c.Subject,
             GradeLevel = c.GradeLevel.ToString(),
             Description = c.Description,
+            Price = c.Price,
             TeacherName = c.Teacher != null
                 ? $"{c.Teacher.FirstName} {c.Teacher.LastName}"
                 : "Unknown Teacher",
@@ -109,6 +109,7 @@ public class CourseService : ICoursesService
             Subject = c.Subject,
             GradeLevel = c.GradeLevel.ToString(),
             Description = c.Description,
+            Price = c.Price,
             TeacherName = c.Teacher != null
                         ? $"{c.Teacher.FirstName} {c.Teacher.LastName}"
                         : "Unknown Teacher",

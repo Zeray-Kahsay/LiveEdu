@@ -5,6 +5,7 @@ import { FiMail, FiLock, FiUser, FiBook } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useRegisterUserMutation } from "./authApi";
 import LoadingIndicator from "../../app/layout/LoadingIndicator";
+import { useNavigate } from "react-router-dom";
 
 const registerSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -27,12 +28,15 @@ export default function RegisterForm() {
   });
 
   const [registerUser] = useRegisterUserMutation();
+  const navigate = useNavigate();
 
   const onSubmit = async (data: RegisterInput) => {
     try {
       const result = await registerUser(data).unwrap();
       toast.success(`Welcome, ${result.firstName}!`);
       reset();
+      navigate("/login");
+
     } catch (err: any) {
       if (err.data?.errors) {
         toast.error(err.data.errors.join(", "));
@@ -136,7 +140,7 @@ export default function RegisterForm() {
         {/* Submit button */}
         <button
           type="submit"
-          className="w-full py-2 rounded-xl bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition"
+          className="w-full py-2 rounded-xl bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition flex items-center justify-center"
         >
           {isSubmitting ? (
             <LoadingIndicator variant="dots" size="sm" colorClass="text-white"/>

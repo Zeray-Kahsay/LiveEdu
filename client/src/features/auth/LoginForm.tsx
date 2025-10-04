@@ -93,10 +93,10 @@ export default function LoginForm() {
         {/* Submit button */}
         <button
           type="submit"
-          className="w-full py-2 rounded-xl bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition"
+          className="w-full py-2 rounded-xl bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition flex items-center justify-center"
         >
           {isSubmitting ? (
-            <LoadingIndicator  variant="dots" size="sm" colorClass="text-white" />
+            <LoadingIndicator  variant="dots" size="sm" colorClass="text-white" className="justify-center"  />
           ): (
            "Login"
           )}

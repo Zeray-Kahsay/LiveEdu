@@ -3,6 +3,7 @@ interface Props {
   size?: "sm" | "md" | "lg";
   colorClass?: string;
   fullPage?: boolean; 
+  className?:string;
 }
 
 const LoadingIndicator = ({ variant = "spinner", size = "md", colorClass = "text-indigo-500", fullPage = false }: Props) => {

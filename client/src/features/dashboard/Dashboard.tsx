@@ -31,7 +31,7 @@ const Dashboard = () => {
           <div
             key={e.enrollmentId}
             className="rounded-2xl shadow-md p-4 bg-white cursor-pointer hover:shadow-lg transition"
-            onClick={() => navigate(`/course/${e.courseId}`)}
+            onClick={() => navigate(`/dashboard/course/${e.courseId}`)}
           >
             <h2 className="text-lg font-semibold">{e.courseTitle}</h2>
             <p className="text-sm text-gray-500">

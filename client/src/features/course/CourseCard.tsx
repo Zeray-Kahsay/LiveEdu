@@ -1,63 +1,39 @@
-import { Button } from "../../app/layout/ui/Button";
-import { useEnrollCourseMutation } from "./EnrollmentApi";
+import { useNavigate } from "react-router-dom";
+import type { CourseDto } from "../../app/types/course/courseDto";
 
-type CourseCardProps = {
-    id: number;
-    title:string;
-    description: string;
-    subject: string;
-    gradeLevel: string;
-    teacherName: string;
-    studentId: number; // from authState
+interface CourseCardProps {
+  course: CourseDto;
+  studentId?: number;
 }
 
-
-const CourseCard = ({
-    id, 
-    title,
-    description,
-    subject,
-    gradeLevel,
-    teacherName,
-    studentId
-} : CourseCardProps) => {
-    const [enrollCourse, {isLoading, isSuccess, isError, error}] = useEnrollCourseMutation();
-
-
-    const handleEnroll = async () => {
-        try {
-            await enrollCourse({ courseId: id, studentId}).unwrap();
-        } catch (error) {
-            console.log("Enrollment failed", error);
-        }
-    }
-
-
+const CourseCard = ({ course }: CourseCardProps) => {
+  const navigate = useNavigate();
 
   return (
-    <div className="rounded-2xl shadow-md p-4 bg-white space-y-3">
-      <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="text-gray-600">{description}</p>
-      <p className="text-sm text-gray-500">
-        {subject} • {gradeLevel}
-      </p>
-      <p className="text-sm text-gray-500">👨‍🏫 {teacherName}</p>
+    <div
+      onClick={() => navigate(`/courses/${course.id}`)}
+      className="group relative bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+    >
+      {/* Thumbnail placeholder */}
+      <div className="h-40 bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white text-lg font-bold font-serif">
+        {course.title.toLocaleUpperCase()}
+      </div>
 
-      <Button
-        className="w-full"
-        onClick={handleEnroll}
-        disabled={isLoading}
-      >
-        {isLoading ? "Enrolling..." : isSuccess ? "Enrolled ✅" : "Enroll"}
-      </Button>
+      <div className="p-4 space-y-2">
+        <h3 className="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition">
+          {course.title}
+        </h3>
+        <p className="text-sm text-gray-600 line-clamp-2">{course.description}</p>
 
-      {isError && (
-        <p className="text-red-500 text-sm mt-2">
-          {(error as any)?.data?.errors?.[0] || "Enrollment failed"}
-        </p>
-      )}
+        <div className="flex justify-between items-center text-sm mt-3">
+          <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+            {course.subject}
+          </span>
+          <span className="text-indigo-600 font-medium">{course.gradeLevel}</span>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default CourseCard
+export default CourseCard;
