@@ -10,6 +10,9 @@ import CourseDetails from "../../features/course/CourseDetails";
 import Dashboard from "../../features/dashboard/Dashboard";
 import RequireAuth from "./RequireAuth";
 import CourseInfo from "../../features/course/CourseInfo";
+import CartPage from "../../features/cart/CartPage";
+import CheckoutPage from "../../features/cart/CheckoutPage";
+import NotFoundPage from "../layout/ui/NotFoundPage";
 
 export const router = createBrowserRouter([
     {
@@ -26,13 +29,17 @@ export const router = createBrowserRouter([
             {path: '/contact', element: <ContactPage />},
             {path: '/dashboard/course/:id', element: <CourseDetails />},
             {path: '/courses/:id', element: <CourseInfo />},
+            {path: '*', element: <NotFoundPage />},
 
 
             // Protected routes
             {
                 element: <RequireAuth />,
                 children: [
-                    {path: "/dashboard", element: <Dashboard />}
+                    {path: "/dashboard", element: <Dashboard />},
+                    {path: "/cartPage", element: <CartPage /> },
+                    {path: "/checkout", element: <CheckoutPage />}
+
                 ]
             }
         ]

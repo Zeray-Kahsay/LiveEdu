@@ -4,11 +4,13 @@ import { useAppSelector, useAppDispatch } from "../store/store";
 
 import { Menu, X } from "lucide-react"; // hamburger and X icons
 import { logout } from "../../features/auth/authSlice";
+import CartIcon from "../../features/cart/CartIcon";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const handleLogout = () => {
@@ -46,6 +48,15 @@ export default function Navbar() {
                 <Link to="/profile" className="text-white hover:font-semibold">
                   Profile
                 </Link>
+                <CartIcon />
+                 {/* <Link to="/cart" className="relative mr-12">
+                   <ShoppingCart className="w-6 h-6 text-gray-700 hover:text-blue-600" />
+                     {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Link> */}
                 <button
                   onClick={handleLogout}
                   className="bg-yellow-300 text-indigo-800 px-3 py-1 rounded-lg font-semibold hover:bg-yellow-400"
@@ -101,6 +112,7 @@ export default function Navbar() {
               >
                 Logout
               </button>
+              <CartIcon />
             </>
           ) : (
             <>

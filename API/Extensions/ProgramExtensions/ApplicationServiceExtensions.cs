@@ -11,6 +11,8 @@ using API.Repositories.Account;
 using API.Repositories.CourseEnrollment;
 using API.Services;
 using System.Text.Json.Serialization;
+using API.Interfaces.CourseCart;
+using API.Repositories.CourseCart;
 
 namespace API.Extensions.ProgramExtensions;
 
@@ -35,6 +37,9 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ICoursesService, CourseService>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
+        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<ICartService, CartService>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         services.AddCors(options =>
         {
@@ -51,11 +56,14 @@ public static class ApplicationServiceExtensions
             options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
         });
 
-        // Jwt token settings strongly typed configuration
+        // strongly typed configuration for JWT token 
         services.Configure<JwtSettings>(config.GetSection("JwtSettings"));
         var jwtSettings = config
                             .GetSection("JwtSettings")
                             .Get<JwtSettings>() ?? throw new InvalidOperationException("Jwt settings is missing");
+
+        // strongly typed configuration for Stripe
+        services.Configure<StripeSettings>(config.GetSection("StripeSettings"));
 
         services.AddAuthentication(options =>
         {

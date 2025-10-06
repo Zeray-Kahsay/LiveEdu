@@ -1,16 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
 
 import { BookOpen } from "lucide-react";
-import { useAppSelector } from "../../app/store/store";
+import { useAppDispatch, useAppSelector } from "../../app/store/store";
 import { useGetCourseByIdQuery } from "./courseApi";
 import LoadingIndicator from "../../app/layout/LoadingIndicator";
 import EmptyState from "../../app/layout/ui/EmptyState";
 import { Button } from "../../app/layout/ui/Button";
+import { addItemToCart } from "../cart/CartSlice";
 
 const CourseInfo = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAppSelector((s) => s.auth);
+  const dispatch = useAppDispatch();
 
   const { data: course, isLoading, isError } = useGetCourseByIdQuery(Number(id));
 
@@ -18,6 +20,20 @@ const CourseInfo = () => {
     if (!user) {
       navigate("/login");
       return;
+    }
+
+    if (course){
+      dispatch(addItemToCart({
+        courseId: course.id,
+        title: course.title,
+        description: course.description,
+        price: course.price,
+        subject: course.subject,
+        gradeLevel: course.gradeLevel,
+        teacherName: course.teacherName,
+        quantity: 1
+      }));
+     // navigate("/cart");
     }
 
     // TODO: Add to cart or trigger enrollment flow

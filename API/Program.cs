@@ -41,13 +41,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseCors(opt =>
-//    {
-//        opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins([
-//            "http://localhost:3000",
-//             "https://localhost:3000"
-//        ]);
-//    });
+
 app.UseGlobalExceptionHandler(); // Custom global exception handler
 app.UseCors("CorsPolicy");
 app.UseRouting();

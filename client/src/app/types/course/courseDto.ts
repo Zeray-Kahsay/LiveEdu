@@ -9,4 +9,5 @@ export interface CourseDto {
   gradeLevel: string;
   teacherName: string;
   sessions: SessionDto[];
+  quantity?: number;
 }

@@ -1,0 +1,23 @@
+1. the cart slice type should be a type of Cart.ts since i need to generate cartId 
+2. Why do we have the userID as optional inside Order.cs, think it should be REQUIRED! and why do we need to have a property total
+   isn't possible to calculate the total price from item -> course's price multiplied by Quantity
+3. inside CreatePaymentDto - why is userId optional since it is only authenticated users should 
+   create the payment intent
+4. Inside OrderItem, why don't we have a fully defined relationship between OrderItem and Course
+5. Inside PaymentService
+    var order = new Order
+        {
+            UserId = dto.UserId,
+            Total = totalDecimal,
+            PaymentIntentId = pi.Id,
+            IsPaid = false,
+            Items = dto.Items.Select(it => new OrderItem
+            {
+                CourseId = it.CourseId,
+                CourseTitle = it.Title,
+                Price = it.Price,
+                Quantity = it.Quantity
+            }).ToList()
+        };
+    Order contains OrderItem and OrderItem has Order so isn't going to create a circular referance 
+    so i think we need to return an OrderItemDto instead of the class - OrderItem 

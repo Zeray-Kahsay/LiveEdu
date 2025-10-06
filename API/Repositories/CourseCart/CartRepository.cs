@@ -1,0 +1,37 @@
+using API.Data;
+using API.Entities.CourseCart;
+using API.Interfaces.CourseCart;
+using Microsoft.EntityFrameworkCore;
+
+namespace API.Repositories.CourseCart;
+
+public class CartRepository(AppDbContext context) : ICartRepository
+{
+    public async Task<Cart?> GetCartByIdAsync(string cartId)
+    {
+        return await context.Carts
+                    .Include(c => c.Items)
+                    .ThenInclude(ct => ct.Course)
+                    .FirstOrDefaultAsync(c => c.CartId == cartId);
+    }
+
+
+    public async Task AddCartAsync(Cart cart)
+    {
+        await context.Carts.AddAsync(cart);
+    }
+
+
+    public void UpdateCart(Cart cart)
+    {
+        context.Carts.Update(cart);
+    }
+
+
+    public async Task<bool> SaveChangesAsync()
+    {
+        return await context.SaveChangesAsync() > 0;
+    }
+}
+
+

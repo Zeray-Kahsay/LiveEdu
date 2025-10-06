@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 import uiReducer from "../layout/uiSlice";
 import authReducer from "../../features/auth/authSlice";
+import cartReducer from "../../features/cart/CartSlice";
 import { apiSlice } from "../api/apiSlice";
 
 
@@ -9,6 +10,7 @@ export const store = configureStore({
     reducer: {
         ui: uiReducer,
         auth: authReducer,
+        cart: cartReducer,
         [apiSlice.reducerPath]: apiSlice.reducer,
     },
    middleware: (getDefaultMiddleware) =>
