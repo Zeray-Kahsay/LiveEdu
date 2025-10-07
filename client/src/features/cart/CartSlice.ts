@@ -32,7 +32,7 @@ const cartSlice = createSlice({
         const existingItem = state.items.find(item => item.courseId == action.payload.courseId);
 
         if (!existingItem){
-            state.items.push({ ...action.payload, quantity: 1 });
+            state.items.push({ ...action.payload, quantity: 1});
         } else {
             existingItem.quantity += 1;
         }

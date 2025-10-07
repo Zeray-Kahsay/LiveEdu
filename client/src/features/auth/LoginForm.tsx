@@ -92,6 +92,7 @@ export default function LoginForm() {
 
         {/* Submit button */}
         <button
+        disabled={isSubmitting}
           type="submit"
           className="w-full py-2 rounded-xl bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition flex items-center justify-center"
         >

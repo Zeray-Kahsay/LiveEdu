@@ -11,8 +11,12 @@ import Dashboard from "../../features/dashboard/Dashboard";
 import RequireAuth from "./RequireAuth";
 import CourseInfo from "../../features/course/CourseInfo";
 import CartPage from "../../features/cart/CartPage";
-import CheckoutPage from "../../features/cart/CheckoutPage";
 import NotFoundPage from "../layout/ui/NotFoundPage";
+import SuccessPage from "../layout/ui/SuccessPage";
+import CheckoutPageWrapper from "../../features/cart/CheckoutPageWrapper";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export const router = createBrowserRouter([
     {
@@ -30,6 +34,7 @@ export const router = createBrowserRouter([
             {path: '/dashboard/course/:id', element: <CourseDetails />},
             {path: '/courses/:id', element: <CourseInfo />},
             {path: '*', element: <NotFoundPage />},
+            {path: "/payment-success", element: <SuccessPage /> },
 
 
             // Protected routes
@@ -38,7 +43,7 @@ export const router = createBrowserRouter([
                 children: [
                     {path: "/dashboard", element: <Dashboard />},
                     {path: "/cartPage", element: <CartPage /> },
-                    {path: "/checkout", element: <CheckoutPage />}
+                    {path: "/checkout", element: <CheckoutPageWrapper stripePromise={stripePromise} />}
 
                 ]
             }

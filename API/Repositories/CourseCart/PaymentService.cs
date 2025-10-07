@@ -33,7 +33,7 @@ public class PaymentService : IPaymentService
             return Result<PaymentIntentResponseDto>.Failure("Cart is empty");
 
         // compute total in smallest currency unit(cents)
-        var totalDecimal = dto.Items.Sum(i => i.Price * i.Quantity);
+        var totalDecimal = dto.Items.Sum(i => i.Price * i.Quantity + 100);
         var amount = (long)(totalDecimal * 100m);
 
         var options = new PaymentIntentCreateOptions
@@ -98,6 +98,7 @@ public class PaymentService : IPaymentService
                 stripeEvent = EventUtility.ParseEvent(json);
             }
 
+
             // Handle events
             switch (stripeEvent.Type)
             {
@@ -105,7 +106,7 @@ public class PaymentService : IPaymentService
                     await HandlePaymentIntentSucceededAsync(stripeEvent);
                     break;
                 case StripeEventTypes.PaymentIntentFailed:
-                    await HandlePaymenetFailedAsync(stripeEvent);
+                    await HandlePaymentIntentFailedAsync(stripeEvent);
                     break;
                 case StripeEventTypes.CheckoutSessionCompleted:
                     HandleCheckoutSessionCompleted(stripeEvent);
@@ -180,7 +181,7 @@ public class PaymentService : IPaymentService
     }
 
     // Payment Intent Failed 
-    private async Task HandlePaymenetFailedAsync(Event stripeEvent)
+    private async Task HandlePaymentIntentFailedAsync(Event stripeEvent)
     {
         if (stripeEvent.Data.Object is not PaymentIntent pi)
         {

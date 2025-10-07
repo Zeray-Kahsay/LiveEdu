@@ -1,12 +1,14 @@
 import { apiSlice } from "../../app/api/apiSlice";
+import type { CreatePaymentDto } from "../../app/types/cart/CreatePaymentDto";
+import type { PaymentIntentResponseDto } from "../../app/types/cart/PaymentIntentResponseDto";
 
 export const paymentApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    createPaymentIntent: builder.mutation({
-      query: (cart) => ({
-        url: "/payment/create-intent",
+    createPaymentIntent: builder.mutation<PaymentIntentResponseDto, CreatePaymentDto>({
+      query: (data) => ({
+        url: "/payment/create-payment-intent",
         method: "POST",
-        body: cart,
+        body: data,
       }),
     }),
   }),
