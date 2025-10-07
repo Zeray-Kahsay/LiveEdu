@@ -40,6 +40,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IPaymentService, PaymentService>();
 
         services.AddCors(options =>
         {

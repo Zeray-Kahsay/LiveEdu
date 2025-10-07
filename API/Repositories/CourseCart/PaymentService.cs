@@ -1,11 +1,12 @@
 
-using System.Collections.Generic;
 using API.Data;
 using API.DTOs.cart;
+using API.Entities;
 using API.Entities.CourseCart;
 using API.Helpers;
 using API.Interfaces.CourseCart;
 using API.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stripe;
 
@@ -39,6 +40,7 @@ public class PaymentService : IPaymentService
         {
             Amount = amount,
             Currency = dto.Currency,
+            PaymentMethodTypes = ["card"],
             Metadata = new Dictionary<string, string>
             {
                 {"userId", dto.UserId?.ToString() ?? ""}
@@ -79,10 +81,142 @@ public class PaymentService : IPaymentService
 
     }
 
-
-
-    public Task<Result> HandleWebhookAsync(string json, string signHeader)
+    public async Task<Result> HandleWebhookAsync(string json, string signHeader)
     {
-        throw new NotImplementedException();
+        try
+        {
+            Event stripeEvent;
+
+            // Verify the webhook signature
+            if (!string.IsNullOrEmpty(_settings.WebhookSecret))
+            {
+                stripeEvent = EventUtility.ConstructEvent(json, signHeader, _settings.WebhookSecret);
+
+            }
+            else
+            {
+                stripeEvent = EventUtility.ParseEvent(json);
+            }
+
+            // Handle events
+            switch (stripeEvent.Type)
+            {
+                case StripeEventTypes.PaymentIntentSucceeded:
+                    await HandlePaymentIntentSucceededAsync(stripeEvent);
+                    break;
+                case StripeEventTypes.PaymentIntentFailed:
+                    await HandlePaymenetFailedAsync(stripeEvent);
+                    break;
+                case StripeEventTypes.CheckoutSessionCompleted:
+                    HandleCheckoutSessionCompleted(stripeEvent);
+                    break;
+                default:
+                    _logger.LogInformation("Unhandled Stripe event type: {EventType}", stripeEvent.Type);
+                    break;
+            }
+
+            return Result.Success();
+        }
+        catch (StripeException sEX)
+        {
+            _logger.LogError(sEX, "Stripe webhook error");
+            return Result.Failure($"Stripe webhook error: {sEX.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Webhook processing error");
+            return Result.Failure($"Webhook processing error: {ex.Message}");
+        }
+    }
+
+    // Payment intent succeeded
+    private async Task HandlePaymentIntentSucceededAsync(Event stripeEvent)
+    {
+        if (stripeEvent.Data.Object is not PaymentIntent pi)
+        {
+            _logger.LogWarning("Invalid payment intent object");
+            return;
+        }
+
+        var order = await _orderRepository.GetByPaymentIntentIdAsync(pi.Id);
+        if (order is null)
+        {
+            _logger.LogWarning("Order not found for paymentIntent {PaymentIntentId}", pi.Id);
+            return;
+        }
+
+        order.IsPaid = true;
+        order.PaymentStatus = "Succeeded";
+        order.PaidAt = DateTime.UtcNow;
+
+        _orderRepository.UpdateOrder(order);
+        await _orderRepository.SaveChangesAsync();
+
+        if (order.UserId.HasValue)
+        {
+            var userId = order.UserId.Value;
+            foreach (var item in order.Items)
+            {
+                bool alreadyEnrolled = await _context.Enrollments.AnyAsync(e =>
+                      e.CourseId == item.CourseId && e.StudentId == userId);
+
+                if (!alreadyEnrolled)
+                {
+                    _context.Enrollments.Add(new Enrollment
+                    {
+                        CourseId = item.CourseId,
+                        StudentId = userId,
+                        EnrolledAt = DateTime.UtcNow,
+                        Status = EnrollmentStatus.Enrolled
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        _logger.LogInformation("Payment succeeded and order {orderId} updated", order.OrderId);
+
+    }
+
+    // Payment Intent Failed 
+    private async Task HandlePaymenetFailedAsync(Event stripeEvent)
+    {
+        if (stripeEvent.Data.Object is not PaymentIntent pi)
+        {
+            _logger.LogWarning("Invalid payment intent object");
+            return;
+        }
+
+        var order = await _orderRepository.GetByPaymentIntentIdAsync(pi.Id);
+        if (order is null)
+        {
+            _logger.LogWarning("Order not found for PaymentIntent {PaymentIntentId}", pi.Id);
+        }
+
+
+        if (order is not null)
+        {
+            order.PaymentStatus = "Failed";
+            _orderRepository.UpdateOrder(order);
+
+        }
+
+        await _orderRepository.SaveChangesAsync();
+
+        _logger.LogWarning("Payment failed for PaymentIntent {PaymentIntentId}", pi.Id);
+
+    }
+
+    // Payment Intent completed 
+    private void HandleCheckoutSessionCompleted(Event stripeEvent)
+    {
+        if (stripeEvent.Data.Object is not Session session)
+        {
+            _logger.LogWarning("Invalid checkout session object");
+            return;
+        }
+
+        _logger.LogWarning("Checkout session completed: {SessionId}", session.SessionId);
     }
 }

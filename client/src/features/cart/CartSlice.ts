@@ -1,19 +1,21 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { CartItem } from "../../app/types/cart/CartItem";
+import type { Cart } from "../../app/types/cart/Cart";
 
-interface CartState {
-    items: CartItem[]; // i think the cartState should be a type of Cart.ts since cart id needs to be generated
+
+const initialState: Cart = {
+    id: crypto.randomUUID(),
+    items: [],
+    total: 0,
 }
 
-const initialState: CartState = {
-   items: [],
-}
+// TODO: move these logics into a dedicated file
 
 // Save and load from localStorage
-const saveCartToStorage = (cart: CartState) => {
+const saveCartToStorage = (cart: Cart) => {
     localStorage.setItem("cart", JSON.stringify(cart));
 }
-const loadCartFromStorage = () : CartState => {
+const loadCartFromStorage = () : Cart => {
     try {
         const saved = localStorage.getItem("cart");
         return saved ? JSON.parse(saved) : initialState;
