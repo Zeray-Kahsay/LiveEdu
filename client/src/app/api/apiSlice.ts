@@ -4,6 +4,6 @@ import { baseQueryWithReauthAndErrorHandling } from "./baseApi";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauthAndErrorHandling,
-  tagTypes: ["User", "Courses", "Enrollments", "Assignments", "Submissions"],
+  tagTypes: ["User", "Courses", "Enrollments", "Assignments", "Submissions", "Cart", "Orders"],
   endpoints: () => ({}),
 });

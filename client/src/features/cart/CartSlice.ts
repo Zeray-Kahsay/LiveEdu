@@ -3,6 +3,7 @@ import type { CartItem } from "../../app/types/cart/CartItem";
 import type { Cart } from "../../app/types/cart/Cart";
 
 
+
 const initialState: Cart = {
     id: crypto.randomUUID(),
     items: [],

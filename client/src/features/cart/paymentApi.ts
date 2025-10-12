@@ -6,7 +6,7 @@ export const paymentApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createPaymentIntent: builder.mutation<PaymentIntentResponseDto, CreatePaymentDto>({
       query: (data) => ({
-        url: "/payment/create-payment-intent",
+        url: "/payments/create-payment-intent",
         method: "POST",
         body: data,
       }),

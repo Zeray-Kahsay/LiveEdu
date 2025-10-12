@@ -1,5 +1,6 @@
-using API.Entities;
-using API.Entities.CourseCart;
+using API.Entities.Carts;
+using API.Entities.Courses;
+using API.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -22,10 +23,27 @@ public class AppDbContext : IdentityDbContext
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<Course>()
+              .Property(c => c.Price)
+              .HasPrecision(18, 2);
+
+        builder.Entity<OrderItem>()
+              .Property(c => c.Price)
+              .HasPrecision(18, 2);
+
+        builder.Entity<CartItem>()
+              .Property(c => c.Price)
+              .HasPrecision(18, 2);
+
+        builder.Entity<Order>()
+                .Property(o => o.Total)
+                .HasPrecision(18, 2);
 
 
 
@@ -99,6 +117,29 @@ public class AppDbContext : IdentityDbContext
                .WithOne(ur => ur.Role)
                .HasForeignKey(ar => ar.RoleId)
                .IsRequired();
+
+        builder.Entity<Order>()
+            .HasOne(o => o.Payment)
+            .WithOne(p => p.Order)
+            .HasForeignKey<Payment>(p => p.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Order>()
+            .HasMany(o => o.Items)
+            .WithOne(oi => oi.Order)
+            .HasForeignKey(oi => oi.OrderId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<OrderItem>()
+            .HasOne(oi => oi.Course)
+            .WithMany()
+            .HasForeignKey(oi => oi.CourseId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
 
 
     }

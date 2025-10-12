@@ -1,6 +1,5 @@
-
-using API.DTOs.Account.User;
-using API.Entities;
+using API.DTOs.Accounts.User;
+using API.Entities.Users;
 
 namespace API.Interfaces;
 

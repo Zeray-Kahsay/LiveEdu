@@ -1,35 +1,67 @@
-import { useCreatePaymentIntentMutation } from "./paymentApi";
-import { Elements } from "@stripe/react-stripe-js";
+import { useEffect, useState } from "react";
 import CheckoutPage from "./CheckoutPage";
+import { useCreateOrderMutation } from "../order/OrderApi";
+import { useCreatePaymentIntentMutation } from "./paymentApi";
 import { useAppSelector } from "../../app/store/store";
-import type { loadStripe } from "@stripe/stripe-js";
-import { useEffect } from "react";
+import LoadingIndicator from "../../app/layout/LoadingIndicator";
 
-interface CheckoutPageWrapperProps {
-  stripePromise: ReturnType<typeof loadStripe>;
-}
 
-export default function CheckoutPageWrapper({ stripePromise }: CheckoutPageWrapperProps) {
-  const cart = useAppSelector((state) => state.cart);
-  const userId = useAppSelector((state) => state.auth.user?.id);
-  const [createPaymentIntent, { data: paymentData, isLoading }] = useCreatePaymentIntentMutation();
 
-  // fetch client secret when cart has items
+export default function CheckoutWrapper() {
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const { id } = useAppSelector((state) => state.auth.user!);
+  const [orderId, setOrderId] = useState<number | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+  const [createOrder, { isLoading: isOrderLoading }] = useCreateOrderMutation();
+  const [createPaymentIntent, { isLoading: isPaymentLoading }] = useCreatePaymentIntentMutation();
+
   useEffect(() => {
-    if (cart.items.length > 0 && userId) {
-      createPaymentIntent({
-        items: cart.items,
-        currency: "usd",
-        userId,
-      });
-    }
-  }, [cart, userId, createPaymentIntent]);
+    const initPayment = async () => {
+      try {
+        // 1️⃣ Create the order first
+        const orderPayload = {
+          items: cartItems.map(item => ({
+            courseId: item.courseId,
+            title: item.title,
+            price: item.price,
+            quantity: item.quantity,
+            subject: item.subject,
+            gradeLevel: item.gradeLevel,
+            teacherName: item.teacherName,
+            description: item.description,
+          })),
+          userId: id,
+          currency: "usd",
+        };
 
-  if (!paymentData?.clientSecret) return <p>Preparing your payment...</p>;
+        const createdOrder = await createOrder(orderPayload).unwrap();
+        setOrderId(createdOrder.orderId);
 
-  return (
-    <Elements stripe={stripePromise} options={{ clientSecret: paymentData.clientSecret }}>
-      <CheckoutPage />
-    </Elements>
-  );
+        // 2️⃣ Then create the Stripe PaymentIntent
+        const paymentPayload = {
+          orderId: createdOrder.orderId,
+          currency: "usd",
+          items: cartItems,
+          userId: id,
+        };
+
+        const payment = await createPaymentIntent(paymentPayload).unwrap();
+        console.log("PaymentIntent created:", payment);
+        setClientSecret(payment.clientSecret);
+      } catch (err) {
+        console.error("Payment init failed:", err);
+      }
+    };
+
+    if (cartItems.length > 0) initPayment();
+  }, [cartItems, createOrder, createPaymentIntent]);
+
+  if (isOrderLoading || isPaymentLoading) 
+    return <LoadingIndicator variant="spinner" size="lg" colorClass="white-text" />;
+
+  if (!clientSecret || !orderId)
+    return <div className="text-center text-gray-500">Preparing checkout...</div>;
+
+  return <CheckoutPage clientSecret={clientSecret} orderId={orderId} />;
 }

@@ -1,6 +1,8 @@
 using System.Text.Json;
 using API.Data;
 using API.Entities;
+using API.Entities.Courses;
+using API.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -100,6 +102,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade1,
         Description = "Fun with numbers!",
         TeacherId = teacher.Id,
+        Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -127,6 +130,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade8,
         Description = "Equations and more",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -154,6 +158,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade6,
         Description = "Introduction to life science",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -181,6 +186,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade10,
         Description = "Explore past civilizations",
         TeacherId = teacher.Id,
+        Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -208,6 +214,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade1,
         Description = "Fun with numbers!",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -235,6 +242,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade8,
         Description = "Equations and more",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -262,6 +270,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade6,
         Description = "Introduction to life science",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -289,6 +298,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade10,
         Description = "Explore past civilizations",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -316,6 +326,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade1,
         Description = "Fun with numbers!",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -343,6 +354,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade8,
         Description = "Equations and more",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -370,6 +382,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade6,
         Description = "Introduction to life science",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -397,6 +410,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade10,
         Description = "Explore past civilizations",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -424,6 +438,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade1,
         Description = "Fun with numbers!",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -451,6 +466,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade8,
         Description = "Equations and more",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -478,6 +494,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade6,
         Description = "Introduction to life science",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session
@@ -505,6 +522,7 @@ public static class DbInitializer
         GradeLevel = GradeLevel.Grade10,
         Description = "Explore past civilizations",
         TeacherId = teacher.Id,
+         Price = 99.90m,
         Sessions = new List<Session>
         {
             new Session

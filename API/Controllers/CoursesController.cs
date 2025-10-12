@@ -1,7 +1,6 @@
-using System.Text.Json;
-using API.DTOs.Course;
+using API.DTOs.Courses;
 using API.Helpers;
-using API.Interfaces.CourseEnrollment;
+using API.Interfaces.Courses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;

@@ -5,7 +5,7 @@ import { setCredentials } from "../../features/auth/authSlice";
 import { useEffect } from "react";
 
 function App() {
- const studentId = useAppSelector(state => state.auth.user?.id);
+ const studentId = useAppSelector(state => state.auth.user?.id); 
 
  useEffect(() => {
    const storedAuth = localStorage.getItem("auth");

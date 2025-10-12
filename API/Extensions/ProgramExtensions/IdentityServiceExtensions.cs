@@ -1,6 +1,7 @@
 
 using API.Data;
 using API.Entities;
+using API.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace API.Extensions.ProgramExtensions;

@@ -1,6 +1,6 @@
-using API.DTOs.Course;
+using API.DTOs.Enrollments;
 using API.Helpers;
-using API.Interfaces.CourseEnrollment;
+using API.Interfaces.Enrollments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

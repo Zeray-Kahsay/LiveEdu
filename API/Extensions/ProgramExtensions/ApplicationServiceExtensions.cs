@@ -4,15 +4,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using API.Data;
 using API.Interfaces;
-using API.Interfaces.Account;
-using API.Interfaces.CourseEnrollment;
 using API.Repositories;
-using API.Repositories.Account;
 using API.Repositories.CourseEnrollment;
 using API.Services;
 using System.Text.Json.Serialization;
-using API.Interfaces.CourseCart;
 using API.Repositories.CourseCart;
+using Stripe;
+using API.Interfaces.Accounts;
+using API.Repositories.Accounts;
+using API.Interfaces.Courses;
+using API.Interfaces.Enrollments;
+using API.Interfaces.Carts;
+using API.Repositories.Carts;
+using API.Interfaces.Orders;
+using API.Interfaces.Payments;
+using API.Repositories.Orders;
+using API.Repositories.Payments;
 
 namespace API.Extensions.ProgramExtensions;
 
@@ -21,6 +28,16 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
         // Add application services here
+        // strongly typed configuration for Stripe
+        services.Configure<StripeSettings>(config.GetSection("StripeSettings"));
+        var stripeSettings = config
+                                .GetSection("StripeSettings")
+                                .Get<StripeSettings>() ?? throw new InvalidOperationException("Stripe settings is missing");
+        StripeConfiguration.ApiKey = stripeSettings.SecretKey;
+
+        Console.WriteLine($"Stripe WEBHOOK Key: {stripeSettings.WebhookSecret}");
+
+
         services.AddControllers()
             .AddJsonOptions(opt =>
             {
@@ -30,7 +47,7 @@ public static class ApplicationServiceExtensions
         services.AddOpenApi();
         services.AddSwaggerGen();
 
-        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ITokenService, Services.TokenService>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<ICourseRepository, CourseRepository>();
@@ -40,6 +57,8 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IPaymentService, PaymentService>();
 
         services.AddCors(options =>
@@ -57,14 +76,12 @@ public static class ApplicationServiceExtensions
             options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
         });
 
+
         // strongly typed configuration for JWT token 
         services.Configure<JwtSettings>(config.GetSection("JwtSettings"));
         var jwtSettings = config
                             .GetSection("JwtSettings")
                             .Get<JwtSettings>() ?? throw new InvalidOperationException("Jwt settings is missing");
-
-        // strongly typed configuration for Stripe
-        services.Configure<StripeSettings>(config.GetSection("StripeSettings"));
 
         services.AddAuthentication(options =>
         {
