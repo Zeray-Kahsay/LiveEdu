@@ -6,6 +6,7 @@ import { useLoginUserMutation } from "./authApi";
 import { toast } from "react-toastify";
 import LoadingIndicator from "../../app/layout/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -32,23 +33,6 @@ export default function LoginForm() {
     localStorage.setItem("deviceId", deviceId);
 
     const result = await loginUser({ ...data, deviceId }).unwrap();
-
-    // result is AuthResponse: { accessToken, refreshToken, user }  // THIS IS DONE INSIDE authApi.ts
-    // dispatch(setCredentials({
-    //   user: {
-    //     id: result.user.id,
-    //     email: result.user.email,
-    //     firstName: result.user.firstName,
-    //     lastName: result.user.lastName,
-    //     roles: result.user.roles || [],
-    //     schoolName: result.user.schoolName,
-    //   },
-    //   accessToken: result.accessToken,
-    //   refreshToken: result.refreshToken,
-    // }));
-
-    // localStorage.setItem("auth", JSON.stringify(result));
-
     reset();
     navigate("/dashboard");
 
@@ -92,7 +76,7 @@ export default function LoginForm() {
 
         {/* Submit button */}
         <button
-        disabled={isSubmitting}
+         disabled={isSubmitting}
           type="submit"
           className="w-full py-2 rounded-xl bg-indigo-500 text-white font-bold hover:bg-indigo-600 transition flex items-center justify-center"
         >
@@ -102,6 +86,9 @@ export default function LoginForm() {
            "Login"
           )}
         </button>
+        <div>
+
+        </div>
       </form>
     </div>
   );

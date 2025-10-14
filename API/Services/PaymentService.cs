@@ -2,12 +2,14 @@
 using API.Data;
 using API.DTOs.Payments;
 using API.Entities.Carts;
+using API.Entities.Courses;
 using API.Helpers;
 using API.Interfaces.Orders;
 using API.Interfaces.Payments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stripe;
+using Stripe.Checkout;
 
 namespace API.Services;
 
@@ -127,9 +129,6 @@ public class PaymentService : IPaymentService
                 case StripeEventTypes.PaymentIntentFailed:
                     await HandlePaymentIntentFailedAsync(stripeEvent);
                     break;
-                case StripeEventTypes.CheckoutSessionCompleted:
-                    _logger.LogInformation("Checkout session completed (no-op or extend as needed)");
-                    break;
                 default:
                     _logger.LogInformation("Unhandled Stripe event type: {EventType}", stripeEvent.Type);
                     break;
@@ -176,6 +175,8 @@ public class PaymentService : IPaymentService
         {
             order.IsPaid = true;
             order.PaidAt = DateTime.UtcNow;
+            order.Payment!.Status = PaymentStatus.Succeeded; // TODO: C#14 null safety
+            order.PaymentId = payment.PaymentId;
             await _orderRepository.UpdateOrder(order);
             await _orderRepository.SaveChangesAsync();
 

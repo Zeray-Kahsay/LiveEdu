@@ -20,20 +20,24 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
         return Ok(result.Value);
     }
 
-    // Stripe webhook (no auth)
+
     [HttpPost("webhook")]
     public async Task<IActionResult> Webhook()
     {
-        var body = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+        var body = await new StreamReader(Request.Body).ReadToEndAsync();
         var signature = Request.Headers["Stripe-Signature"].FirstOrDefault() ?? string.Empty;
 
+        logger.LogInformation("Signature: {Signature}", signature);
+        Console.WriteLine($"Signature: {signature}");
+
         logger.LogInformation("Stripe webhook received");
-        var result = await paymentService.HandleWebhookAsync(body, signature);
-        if (!result.IsSuccess)
-        {
-            logger.LogWarning("Webhook processing failed: {Errors}", string.Join(",", result.Errors ?? []));
-            return BadRequest(new ApiErrorDto { Status = 400, Message = "Webhook processing failed", Errors = result.Errors });
-        }
+        Console.WriteLine("Stripe webhook received");
+        _ = Task.Run(() => paymentService.HandleWebhookAsync(body, signature));
+        // if (!result.IsSuccess)
+        // {
+        //     logger.LogWarning("Webhook processing failed: {Errors}", string.Join(",", result.Errors ?? []));
+        //     return BadRequest(new ApiErrorDto { Status = 400, Message = "Webhook processing failed", Errors = result.Errors });
+        // }
 
         return Ok();
     }

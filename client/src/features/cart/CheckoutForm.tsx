@@ -1,5 +1,7 @@
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useState } from "react";
+import { clearCart } from "./CartSlice";
+import { useAppDispatch } from "../../app/store/store";
 
 interface checkoutProps{
   orderId: number;
@@ -10,6 +12,7 @@ export default function CheckoutForm({ orderId }: checkoutProps) {
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,14 +22,16 @@ export default function CheckoutForm({ orderId }: checkoutProps) {
     setIsProcessing(true);
     setMessage(null);
 
-    const { error } = await stripe.confirmPayment({
+    const { error} = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: `${window.location.origin}/order/payment-success?orderId=${orderId}`,
       },
     });
 
-    if (error) {
+    if (!error) {
+      dispatch(clearCart()); // Clear cart after successful payment
+    } else {
       setMessage(error.message ?? "Payment failed. Please try again.");
     }
 
