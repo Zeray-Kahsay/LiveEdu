@@ -16,6 +16,7 @@ import SuccessPage from "../layout/ui/SuccessPage";
 import ErrorPage from "../layout/ui/ErrorPage";
 import CheckoutPage from "../../features/cart/CheckoutPage";
 import CheckoutPageWrapper from "../../features/cart/CheckoutPageWrapper";
+import CreateCourseForm from "../../features/course/CreateCourseForm";
 
 
 export const router = createBrowserRouter([
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
             {path: '/courses/:id', element: <CourseInfo />},
             {path: "order/payment-success", element: <SuccessPage /> },
             {path: "/payment-failed", element: <ErrorPage /> },
+            {path: "/add-course", element: <CreateCourseForm />},
             {path: '*', element: <NotFoundPage />},
 
 
@@ -44,7 +46,8 @@ export const router = createBrowserRouter([
                 children: [
                     {path: "/dashboard", element: <Dashboard />},
                     {path: "/cartPage", element: <CartPage /> },
-                    {path: "/checkout", element: <CheckoutPageWrapper />}
+                    {path: "/checkout", element: <CheckoutPageWrapper />},
+
 
                 ]
             }

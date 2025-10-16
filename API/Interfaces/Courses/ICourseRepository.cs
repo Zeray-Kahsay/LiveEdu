@@ -11,4 +11,8 @@ public interface ICourseRepository : IRepository<Course>
     Task<List<Course>> GetCoursesAsync(CourseParams courseParams);
     Task<IEnumerable<Course>> GetAllWithDetailsAsync();
     Task<Course?> GetByIdWithDetailsAsync(int id);
+
+    // For teacher 
+    Task AddCourseAsync(Course course);
+    Task<bool> SaveAllAsync();
 }

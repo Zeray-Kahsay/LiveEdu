@@ -2,14 +2,12 @@
 using API.Data;
 using API.DTOs.Payments;
 using API.Entities.Carts;
-using API.Entities.Courses;
 using API.Helpers;
 using API.Interfaces.Orders;
 using API.Interfaces.Payments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stripe;
-using Stripe.Checkout;
 
 namespace API.Services;
 

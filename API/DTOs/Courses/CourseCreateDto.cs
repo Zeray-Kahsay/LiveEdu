@@ -1,26 +1,27 @@
 
-using API.Entities.Users;
+using System.ComponentModel.DataAnnotations;
+using API.Entities.Courses;
 
-namespace API.Entities.Courses;
+namespace API.DTOs.Courses;
 
-public class Course
+public record CourseCreateDto
 {
-    public int CourseId { get; set; }
+    [Required]
     public string Title { get; set; } = string.Empty;
+    [Required]
     public string Description { get; set; } = string.Empty;
+    [Required]
     public decimal Price { get; set; }
+    [Required]
     public string ImageUrl { get; set; } = string.Empty;
+    [Required]
     public DateTime StartDate { get; set; }
+    [Required]
     public DateTime EndDate { get; set; }
+    [Required]
     public int MaxStudents { get; set; }
+    [Required]
     public GradeLevel GradeLevel { get; set; }
+    [Required]
     public string Subject { get; set; } = string.Empty;
-
-    public int TeacherId { get; set; }
-    public AppUser Teacher { get; set; } = null!;
-
-    public ICollection<Session> Sessions { get; set; } = [];
-    public ICollection<Enrollment> Enrollments { get; set; } = [];
-
-
 }

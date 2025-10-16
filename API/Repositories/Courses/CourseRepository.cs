@@ -95,4 +95,12 @@ public class CourseRepository : Repository<Course>, ICourseRepository
 
         return items;
     }
+
+    public Task AddCourseAsync(Course course) =>
+        _context.Courses.AddAsync(course).AsTask();
+
+    public async Task<bool> SaveAllAsync() =>
+        await _context.SaveChangesAsync() > 0;
+
+
 }

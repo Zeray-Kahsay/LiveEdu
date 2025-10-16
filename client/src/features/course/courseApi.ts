@@ -55,8 +55,16 @@ export const courseApi = apiSlice.injectEndpoints({
                 return `/courses/filter?${params.toString()}`
             },
             providesTags: ["Courses"]
-        })
-      
+        }),
+        createCourse: builder.mutation({
+          query: (body) => ({
+            url: "courses/add-course",
+            method: "POST",
+            body,
+          }),
+          invalidatesTags: ["Courses"],
+          }),
+            
     }),// endpoints 
 });
 
@@ -64,5 +72,6 @@ export const {
     useGetCoursesQuery, 
     useGetCourseByIdQuery,
     useGetCoursesByFilterQuery,
+    useCreateCourseMutation,
     //useEnrollCourseMutation
 } = courseApi;

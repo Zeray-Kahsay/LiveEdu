@@ -1,9 +1,12 @@
 using API.DTOs.Courses;
 using API.DTOs.Sessions;
+using API.Entities.Courses;
 using API.Helpers;
 using API.Interfaces.Courses;
 
 namespace API.Repositories.CourseEnrollment;
+
+
 
 public class CourseService : ICoursesService
 {
@@ -137,7 +140,28 @@ public class CourseService : ICoursesService
         return Result<CoursePageDto>.Success(response);
     }
 
+    public async Task<Result<Course>> AddCourseAsync(CourseCreateDto dto, int teacherId)
+    {
+        var course = new Course
+        {
+            Title = dto.Title,
+            Description = dto.Description,
+            Price = dto.Price,
+            ImageUrl = dto.ImageUrl,
+            StartDate = dto.StartDate,
+            EndDate = dto.EndDate,
+            MaxStudents = dto.MaxStudents,
+            GradeLevel = dto.GradeLevel,
+            Subject = dto.Subject,
+            TeacherId = teacherId
+        };
 
+        await _courseRepository.AddCourseAsync(course);
+        var success = await _courseRepository.SaveAllAsync();
+        if (!success) return Result<Course>.Failure("Failed to add course");
+
+        return Result<Course>.Success(course);
+    }
 }
 
 

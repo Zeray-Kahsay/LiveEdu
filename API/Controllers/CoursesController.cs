@@ -1,4 +1,5 @@
 using API.DTOs.Courses;
+using API.Extensions;
 using API.Helpers;
 using API.Interfaces.Courses;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,24 @@ public class CoursesController(ICoursesService coursesService) : BaseController
             Message = "No courses found",
             Errors = result.Errors
 
+        });
+    }
+
+    [HttpPost("add-course")]
+    public async Task<IActionResult> AddCourse([FromBody] CourseCreateDto createCourseDto)
+    {
+        var teacherId = User.GetUserId();
+
+
+        var result = await coursesService.AddCourseAsync(createCourseDto, teacherId);
+
+        if (result.IsSuccess) return Ok(result.Value);
+
+        return BadRequest(new ApiErrorDto
+        {
+            Status = 400,
+            Message = "Could not add course",
+            Errors = result.Errors
         });
     }
 
