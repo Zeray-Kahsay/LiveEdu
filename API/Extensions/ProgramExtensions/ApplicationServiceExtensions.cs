@@ -8,7 +8,6 @@ using API.Repositories;
 using API.Repositories.CourseEnrollment;
 using API.Services;
 using System.Text.Json.Serialization;
-using API.Repositories.CourseCart;
 using Stripe;
 using API.Interfaces.Accounts;
 using API.Repositories.Accounts;
@@ -16,10 +15,6 @@ using API.Interfaces.Courses;
 using API.Interfaces.Enrollments;
 using API.Interfaces.Carts;
 using API.Repositories.Carts;
-using API.Interfaces.Orders;
-using API.Interfaces.Payments;
-using API.Repositories.Orders;
-using API.Repositories.Payments;
 
 namespace API.Extensions.ProgramExtensions;
 
@@ -35,7 +30,7 @@ public static class ApplicationServiceExtensions
                                 .Get<StripeSettings>() ?? throw new InvalidOperationException("Stripe settings is missing");
         StripeConfiguration.ApiKey = stripeSettings.SecretKey;
 
-        Console.WriteLine($"Stripe WEBHOOK Key: {stripeSettings.WebhookSecret}");
+        Console.WriteLine($"Stripe WEBHOOK Key: {stripeSettings.WhSecret}");
 
 
         services.AddControllers()
@@ -56,10 +51,11 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<ICartService, CartService>();
-        services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<IOrderService, OrderService>();
-        services.AddScoped<IPaymentRepository, PaymentRepository>();
-        services.AddScoped<IPaymentService, PaymentService>();
+        // services.AddScoped<IOrderRepository, OrderRepository>();
+        //services.AddScoped<IOrderService, OrderService>();
+        //services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<StripePaymentService>();
+        services.AddScoped<CartService>();
 
         services.AddCors(options =>
         {

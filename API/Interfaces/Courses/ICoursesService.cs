@@ -10,5 +10,5 @@ public interface ICoursesService
     Task<Result<CourseDto>> GetCourseByIdAsync(int id);
     Task<Result<IEnumerable<CourseDto>>> GetByGradeAndSubjectAsync(CourseFilterDto filter);
     // For teacher
-    Task<Result<Course>> AddCourseAsync(CourseCreateDto createCourseDto, int teacherId);
+    Task<Result<CourseDto>> AddCourseAsync(CourseCreateDto createCourseDto, int teacherId);
 }

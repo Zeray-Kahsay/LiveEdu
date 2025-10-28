@@ -14,9 +14,8 @@ import CartPage from "../../features/cart/CartPage";
 import NotFoundPage from "../layout/ui/NotFoundPage";
 import SuccessPage from "../layout/ui/SuccessPage";
 import ErrorPage from "../layout/ui/ErrorPage";
-import CheckoutPage from "../../features/cart/CheckoutPage";
-import CheckoutPageWrapper from "../../features/cart/CheckoutPageWrapper";
 import CreateCourseForm from "../../features/course/CreateCourseForm";
+import CheckoutPage from "../../features/cart/CheckoutPage";
 
 
 export const router = createBrowserRouter([
@@ -46,7 +45,7 @@ export const router = createBrowserRouter([
                 children: [
                     {path: "/dashboard", element: <Dashboard />},
                     {path: "/cartPage", element: <CartPage /> },
-                    {path: "/checkout", element: <CheckoutPageWrapper />},
+                    {path: "/checkout", element: <CheckoutPage />},
 
 
                 ]

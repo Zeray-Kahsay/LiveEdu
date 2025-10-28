@@ -4,5 +4,5 @@ public class StripeSettings
 {
     public string PublishableKey { get; set; } = default!;
     public string SecretKey { get; set; } = default!;
-    public string WebhookSecret { get; set; } = default!;
+    public string WhSecret { get; set; } = default!;
 }

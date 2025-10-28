@@ -21,19 +21,20 @@ public class AppDbContext : IdentityDbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderItem> OrderItems { get; set; }
-    public DbSet<Payment> Payments { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<Course>()
-              .Property(c => c.Price)
-              .HasPrecision(18, 2);
+        // builder.Entity<CartItem>()
+        //     .Property(ci => ci.CartId)
+        //     .HasConversion(
+        //         v => int.Parse(v),
+        //         v => v.ToString()
+        //     );
 
-        builder.Entity<OrderItem>()
+        builder.Entity<Course>()
               .Property(c => c.Price)
               .HasPrecision(18, 2);
 
@@ -41,15 +42,13 @@ public class AppDbContext : IdentityDbContext
               .Property(c => c.Price)
               .HasPrecision(18, 2);
 
-        builder.Entity<Order>()
-                .Property(o => o.Total)
-                .HasPrecision(18, 2);
-
-
 
         builder.Entity<Enrollment>()
            .Property(e => e.Status)
            .HasConversion<string>();
+
+        builder.Entity<Cart>()
+            .HasAlternateKey(c => c.CartId);
 
 
         builder.Entity<Course>()
@@ -105,6 +104,12 @@ public class AppDbContext : IdentityDbContext
             .WithMany()
             .HasForeignKey(s => s.AssignmentId);
 
+        // builder.Entity<CartItem>()
+        //     .HasOne(it => it.Cart)
+        //     .WithMany(c => c.Items)
+        //     .HasForeignKey(c => c.CartId);
+
+
         // M-M
         builder.Entity<AppUser>()
                      .HasMany(au => au.UserRoles)
@@ -118,24 +123,7 @@ public class AppDbContext : IdentityDbContext
                .HasForeignKey(ar => ar.RoleId)
                .IsRequired();
 
-        builder.Entity<Order>()
-            .HasOne(o => o.Payment)
-            .WithOne(p => p.Order)
-            .HasForeignKey<Payment>(p => p.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<Order>()
-            .HasMany(o => o.Items)
-            .WithOne(oi => oi.Order)
-            .HasForeignKey(oi => oi.OrderId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.Entity<OrderItem>()
-            .HasOne(oi => oi.Course)
-            .WithMany()
-            .HasForeignKey(oi => oi.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
 
 
 

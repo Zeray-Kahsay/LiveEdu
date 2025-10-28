@@ -102,5 +102,11 @@ public class CourseRepository : Repository<Course>, ICourseRepository
     public async Task<bool> SaveAllAsync() =>
         await _context.SaveChangesAsync() > 0;
 
-
+    public async Task<IEnumerable<Course>> GetCoursesByTeacherAsync(int teacherId)
+    {
+        return await _context.Courses
+                .Where(c => c.TeacherId == teacherId)
+                .Include(c => c.Teacher)
+                .ToListAsync();
+    }
 }

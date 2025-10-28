@@ -4,7 +4,9 @@ import { ShoppingCart } from "lucide-react";
 
 const CartIcon = () => {
     const navigate = useNavigate();
-    const itemCount = useAppSelector(state => state.cart.items.reduce((sum, curr) => sum + curr.quantity, 0));
+    const itemCount = useAppSelector(state => state.cart.cart?.items.reduce((sum, curr) => sum + curr.quantity, 0));
+
+    if (itemCount === undefined)return;
   return (
     <button
     onClick={() => navigate("/cartPage")}

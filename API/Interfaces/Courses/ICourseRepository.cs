@@ -14,5 +14,6 @@ public interface ICourseRepository : IRepository<Course>
 
     // For teacher 
     Task AddCourseAsync(Course course);
+    Task<IEnumerable<Course>> GetCoursesByTeacherAsync(int teacherId);
     Task<bool> SaveAllAsync();
 }

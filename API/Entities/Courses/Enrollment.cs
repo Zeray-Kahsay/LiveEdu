@@ -14,7 +14,7 @@ public class Enrollment
     public AppUser Student { get; set; } = null!;
 
     public DateTime EnrolledAt { get; set; }
-    public EnrollmentStatus Status { get; set; }
+    public EnrollmentStatus Status { get; set; } = EnrollmentStatus.UnEnrolled;
     public bool IsActive => Status == EnrollmentStatus.Enrolled;
 
 }
@@ -23,5 +23,6 @@ public enum EnrollmentStatus
 {
     Enrolled = 0,
     Completed = 1,
-    Dropped = 2
+    Dropped = 2,
+    UnEnrolled = 3
 }

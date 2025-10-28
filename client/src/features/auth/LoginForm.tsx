@@ -6,7 +6,6 @@ import { useLoginUserMutation } from "./authApi";
 import { toast } from "react-toastify";
 import LoadingIndicator from "../../app/layout/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -31,8 +30,9 @@ export default function LoginForm() {
   try {
     const deviceId = localStorage.getItem("deviceId") ?? crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
+    const guestCartId = localStorage.getItem("cartId") ?? undefined;
 
-    const result = await loginUser({ ...data, deviceId }).unwrap();
+    const result = await loginUser({ ...data, deviceId, guestCartId }).unwrap();
     reset();
     navigate("/dashboard");
 

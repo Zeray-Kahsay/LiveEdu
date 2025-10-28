@@ -7,9 +7,9 @@ namespace API.DTOs.Courses;
 public record CourseCreateDto
 {
     [Required]
-    public string Title { get; set; } = string.Empty;
+    public required string Title { get; set; }
     [Required]
-    public string Description { get; set; } = string.Empty;
+    public required string Description { get; set; }
     [Required]
     public decimal Price { get; set; }
     [Required]

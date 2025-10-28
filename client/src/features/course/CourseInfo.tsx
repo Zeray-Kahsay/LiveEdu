@@ -1,43 +1,49 @@
 import { useParams, useNavigate } from "react-router-dom";
-
 import { BookOpen } from "lucide-react";
+import {toast} from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../../app/store/store";
 import { useGetCourseByIdQuery } from "./courseApi";
 import LoadingIndicator from "../../app/layout/LoadingIndicator";
 import EmptyState from "../../app/layout/ui/EmptyState";
 import { Button } from "../../app/layout/ui/Button";
-import { addItemToCart } from "../cart/CartSlice";
+import { setCart } from "../cart/CartSlice"; 
+import { useAddItemToCartMutation } from "../cart/cartApi";
 
 const CourseInfo = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAppSelector((s) => s.auth);
+  const cartId  = useAppSelector((s) => s.cart.cart?.cartId); 
   const dispatch = useAppDispatch();
 
   const { data: course, isLoading, isError } = useGetCourseByIdQuery(Number(id));
+  const [addItemToCart, { isLoading: isAdding }] = useAddItemToCartMutation();
 
-  const handleEnroll = () => {
+  const handleEnroll = async () => {
     if (!user) {
       navigate("/login");
       return;
     }
 
-    if (course){
-      dispatch(addItemToCart({
-        courseId: course.id,
-        title: course.title,
-        description: course.description,
-        price: course.price,
-        subject: course.subject,
-        gradeLevel: course.gradeLevel,
-        teacherName: course.teacherName,
-        quantity: 1
-      }));
-     // navigate("/cart");
-    }
+    if (!course) return;
 
-    // TODO: Add to cart or trigger enrollment flow
-    console.log("Enrolled in course:", course?.title);
+    try {
+      const result = await addItemToCart({
+        courseId: course.id,
+        cartId: cartId || localStorage.getItem("cartId") || undefined,
+      }).unwrap();
+
+      // Update redux with new cart data from backend
+      dispatch(setCart(result));
+      localStorage.setItem("cart", JSON.stringify(result));
+      localStorage.setItem("cartId", result.cartId)
+
+      toast.success(`Added ${course.title} to cart!`);
+
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+      toast.error("Could not add course to cart");
+    }
   };
 
   if (isLoading) {
@@ -80,9 +86,10 @@ const CourseInfo = () => {
       <div className="mt-6">
         <Button
           onClick={handleEnroll}
+          disabled={isAdding}
           className="w-2xs font-serif"
         >
-          Enroll
+          {isAdding ? "Enrolling..." : "Enroll"}
         </Button>
       </div>
     </div>

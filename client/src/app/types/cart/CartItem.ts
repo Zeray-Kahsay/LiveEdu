@@ -7,4 +7,5 @@ export type CartItem = {
   gradeLevel: string;
   teacherName: string;
   quantity: number;
+  imageUrl?: string;
 }

@@ -1,4 +1,5 @@
 using API.Entities.Carts;
+using API.Extensions;
 using API.Helpers;
 using API.Repositories.Carts;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace API.Controllers;
 public class CartsController(CartService cartService) : BaseController
 {
     [HttpGet("{id}")]
-    public async Task<ActionResult<Cart>> GetCart(string id)
+    public async Task<ActionResult<Cart>> GetCart(int id)
     {
         var result = await cartService.GetCartAsync(id);
         if (!result.IsSuccess)
@@ -23,15 +24,16 @@ public class CartsController(CartService cartService) : BaseController
     }
 
 
-    [HttpPost("{cartId}/add/{courseId}")]
-    public async Task<ActionResult> AddItem(string cartId, int courseId)
+    [HttpPost("add/{courseId}")]
+    public async Task<ActionResult> AddItem(int courseId, [FromQuery] string? cartId = null)
     {
-        var result = await cartService.AddItemAsync(cartId, courseId);
+        var userId = User.GetUserId();
+        var result = await cartService.AddItemAsync(courseId, cartId, userId);
         if (!result.IsSuccess)
             return BadRequest(new ApiErrorDto
             {
                 Status = 400,
-                Message = "Unable to add iten",
+                Message = "Unable to add item",
                 Errors = result.Errors
             });
 
@@ -40,7 +42,7 @@ public class CartsController(CartService cartService) : BaseController
 
 
     [HttpDelete("{cartId}/remove/{courseId}")]
-    public async Task<ActionResult> RemoveItem(string cartId, int courseId)
+    public async Task<ActionResult> RemoveItem(int cartId, int courseId)
     {
         var result = await cartService.RemoveItemAsync(cartId, courseId);
         if (!result.IsSuccess)
@@ -50,7 +52,7 @@ public class CartsController(CartService cartService) : BaseController
 
 
     [HttpDelete("{cartId}/clear")]
-    public async Task<ActionResult> ClearCart(string cartId)
+    public async Task<ActionResult> ClearCart(int cartId)
     {
         var result = await cartService.ClearCartAsync(cartId);
         if (!result.IsSuccess)

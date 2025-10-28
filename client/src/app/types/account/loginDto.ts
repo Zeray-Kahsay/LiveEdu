@@ -2,4 +2,5 @@ export interface LoginDto {
     email: string;
     password: string;
     deviceId: string;
+    guestCartId?: string;
 }

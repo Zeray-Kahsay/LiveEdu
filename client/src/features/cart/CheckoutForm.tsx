@@ -1,54 +1,50 @@
-import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useState } from "react";
-import { clearCart } from "./CartSlice";
-import { useAppDispatch } from "../../app/store/store";
 
-interface checkoutProps{
-  orderId: number;
+interface CheckoutFormProps {
+  clientSecret: string;
 }
 
-export default function CheckoutForm({ orderId }: checkoutProps) {
+export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!stripe || !elements) return;
 
-    setIsProcessing(true);
+    setLoading(true);
     setMessage(null);
 
-    const { error} = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/order/payment-success?orderId=${orderId}`,
+    const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement)!,
       },
     });
 
-    if (!error) {
-      dispatch(clearCart()); // Clear cart after successful payment
-    } else {
-      setMessage(error.message ?? "Payment failed. Please try again.");
+    if (result.error) {
+      setMessage(result.error.message ?? "Payment failed.");
+    } else if (result.paymentIntent && result.paymentIntent.status === "succeeded") {
+      setMessage("✅ Payment succeeded! You are now enrolled.");
     }
 
-    setIsProcessing(false);
+    setLoading(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement />
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+      <CardElement className="p-3 border rounded-md" />
       <button
         type="submit"
-        disabled={!stripe || isProcessing}
-        className="w-full bg-blue-600 text-white p-2 rounded"
+        disabled={!stripe || loading}
+        className="btn btn-primary w-full"
       >
-        {isProcessing ? "Processing..." : "Pay now"}
+        {loading ? "Processing..." : "Pay Now"}
       </button>
-      {message && <div className="text-red-500 text-sm">{message}</div>}
+      {message && <p className="text-center text-sm text-gray-600">{message}</p>}
     </form>
   );
 }
+

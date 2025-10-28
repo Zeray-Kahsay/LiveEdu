@@ -27,6 +27,11 @@ export const authApi = apiSlice.injectEndpoints({
             dispatch(setCredentials(data));
             // Persist to localStorage
             localStorage.setItem("auth", JSON.stringify(data));
+            // If backend returned merged cart, update it
+            if (data.cart){
+              localStorage.setItem("cart", JSON.stringify(data.cart));
+              localStorage.setItem("cartId", data.cart.cartId);
+            }
         } catch (error) {
           console.log("Login failed", error);
         }

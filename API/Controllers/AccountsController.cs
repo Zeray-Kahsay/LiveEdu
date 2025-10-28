@@ -1,12 +1,13 @@
 using API.DTOs.Accounts.User;
 using API.Helpers;
 using API.Interfaces.Accounts;
+using API.Interfaces.Carts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 
-public class AccountsController(IAccountRepository accountRepository) : BaseController
+public class AccountsController(IAccountRepository accountRepository, ICartService cartService) : BaseController
 {
     [HttpPost("registerUser")]
     public async Task<IActionResult> RegisterUser([FromBody] RegisterDto registerDto)
@@ -35,13 +36,18 @@ public class AccountsController(IAccountRepository accountRepository) : BaseCont
     }
 
     [HttpPost("loginUser")]
-    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+    public async Task<IActionResult> Login([FromBody] LoginDto loginDto, string? guestCartId = null)
     {
         var result = await accountRepository.LoginAsync(loginDto);
         if (result.IsSuccess)
         {
+            if (!string.IsNullOrEmpty(guestCartId))
+            {
+                await cartService.MergeCartsAsync(guestCartId, result.Value!.User.Id);
+            }
             return StatusCode(StatusCodes.Status200OK, result.Value);
         }
+
 
         var errors = result.Errors?.ToArray() ?? new[] { "An unknown error occurred." };
         var status = errors.Any(e => e.Equals("Invalid email or password", StringComparison.OrdinalIgnoreCase))

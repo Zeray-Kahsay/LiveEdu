@@ -7,12 +7,12 @@ namespace API.Repositories.Carts;
 
 public class CartRepository(AppDbContext context) : ICartRepository
 {
-    public async Task<Cart?> GetCartByIdAsync(string cartId)
+    public async Task<Cart?> GetCartByIdAsync(int id)
     {
         return await context.Carts
                     .Include(c => c.Items)
                     .ThenInclude(ct => ct.Course)
-                    .FirstOrDefaultAsync(c => c.CartId == cartId);
+                    .FirstOrDefaultAsync(c => c.Id == id);
     }
 
 

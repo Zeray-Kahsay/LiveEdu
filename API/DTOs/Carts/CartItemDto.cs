@@ -10,4 +10,5 @@ public record CartItemDto
     public string? GradeLevel { get; set; }
     public string? TeacherName { get; set; }
     public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
 }

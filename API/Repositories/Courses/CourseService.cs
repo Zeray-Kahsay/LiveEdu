@@ -140,7 +140,7 @@ public class CourseService : ICoursesService
         return Result<CoursePageDto>.Success(response);
     }
 
-    public async Task<Result<Course>> AddCourseAsync(CourseCreateDto dto, int teacherId)
+    public async Task<Result<CourseDto>> AddCourseAsync(CourseCreateDto dto, int teacherId)
     {
         var course = new Course
         {
@@ -157,10 +157,23 @@ public class CourseService : ICoursesService
         };
 
         await _courseRepository.AddCourseAsync(course);
-        var success = await _courseRepository.SaveAllAsync();
-        if (!success) return Result<Course>.Failure("Failed to add course");
 
-        return Result<Course>.Success(course);
+        var success = await _courseRepository.SaveAllAsync();
+        var dtoToReturn = new CourseDto
+        {
+            Id = course.CourseId,
+            Title = course.Title,
+            Description = course.Description,
+            Price = course.Price,
+            GradeLevel = course.GradeLevel.ToString(),
+            TeacherName = $"{course.Teacher.FirstName} {course.Teacher.LastName}" ?? "Unknown"
+
+        };
+
+
+        if (!success) return Result<CourseDto>.Failure("Failed to add course");
+
+        return Result<CourseDto>.Success(dtoToReturn);
     }
 }
 
