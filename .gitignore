@@ -2,3 +2,34 @@
 .env
 docker-compose.yaml
 note.txt
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+out/
+
+# NuGet
+packages/
+project.assets.json
+*.nupkg
+
+# IDEs
+.vscode/
+.idea/
+
+# OS / sync
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+OneDriveTemp/
+
+# Logs / DB / temp
+*.log
+*.db
