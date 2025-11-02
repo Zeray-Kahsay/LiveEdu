@@ -104,10 +104,11 @@ public class AppDbContext : IdentityDbContext
             .WithMany()
             .HasForeignKey(s => s.AssignmentId);
 
-        // builder.Entity<CartItem>()
-        //     .HasOne(it => it.Cart)
-        //     .WithMany(c => c.Items)
-        //     .HasForeignKey(c => c.CartId);
+        builder.Entity<CartItem>()
+            .HasOne(it => it.Cart)
+            .WithMany(c => c.Items)
+            .HasForeignKey(c => c.CartId)
+            .OnDelete(DeleteBehavior.Cascade);
 
 
         // M-M

@@ -36,63 +36,31 @@ public class CartService(
     {
         try
         {
-            // Get course 
             var course = await context.Courses.FindAsync(courseId);
-            if (course is null) return Result<CartDto>.Failure("Course not found");
+            if (course == null)
+                return Result<CartDto>.Failure("Course not found");
 
-            Cart? cart;
+            var cart = await context.Carts
+                .Include(c => c.Items)
+                .ThenInclude(i => i.Course)
+                .FirstOrDefaultAsync(c => c.CartId == cartId);
 
-            if (string.IsNullOrEmpty(cartId))
+            if (cart == null)
             {
-                // create a new cart 
                 cart = new Cart
                 {
-                    CartId = Guid.NewGuid().ToString(),
+                    CartId = cartId ?? Guid.NewGuid().ToString(),
                     UserId = userId > 0 ? userId : null
                 };
 
-                // persist to DB
-                await cartRepository.AddCartAsync(cart);
-            }
-            else
-            {
-                cart = await context.Carts
-                    .Include(c => c.Items)
-                    .ThenInclude(i => i.Course)
-                    .FirstOrDefaultAsync(c => c.CartId == cartId);
-
-                if (cart is null)
-                {
-                    cart = new Cart
-                    {
-                        CartId = cartId,
-                        UserId = userId > 0 ? userId : null
-                    };
-
-                    await cartRepository.AddCartAsync(cart);
-
-                }
-                else
-                {
-                    if (userId > 0 && cart.UserId == null)
-                    {
-                        // Attach guest cart to logged-in user
-                        cart.UserId = userId;
-                    }
-
-                }
-
-                // Ensure the Items collection is initialized to avoid null dereference
-                cart.Items = new List<CartItem>();
+                context.Carts.Add(cart);
             }
 
+            cart.Items ??= new List<CartItem>();
 
-
-            // check if the course/item already exists in the cart 
             if (cart.Items.Any(i => i.CourseId == courseId))
                 return Result<CartDto>.Failure("Course already in cart");
 
-            // if not, create a cartItem and add it onto the cart
             var item = new CartItem
             {
                 CourseId = course.CourseId,
@@ -104,24 +72,25 @@ public class CartService(
                 Quantity = 1
             };
 
-            // add the item 
             cart.Items.Add(item);
 
+            await context.SaveChangesAsync();
 
-            // Persist to DB
-            var result = await context.SaveChangesAsync() > 0;
-            if (result)
-                return Result<CartDto>.Success(cart.ToCartDto());
+            // Re-fetch cart with all items
+            var fullCart = await context.Carts
+                .Include(c => c.Items)
+                .ThenInclude(i => i.Course)
+                .FirstOrDefaultAsync(c => c.Id == cart.Id);
 
-            return Result<CartDto>.Failure("Failed to add item to cart");
+            return Result<CartDto>.Success(fullCart!.ToCartDto());
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error adding item to cart with cart id: {cartId} and course id:  {courseId}", ex);
-            return Result<CartDto>.Failure("An error occurred while adding item to cart");
+            logger.LogError(ex, "Error adding item to cart");
+            return Result<CartDto>.Failure("Error adding item to cart");
         }
-
     }
+
 
     public async Task<Result> ClearCartAsync(int id)
     {
