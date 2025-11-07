@@ -42,7 +42,7 @@ public class CartsController(CartService cartService) : BaseController
 
 
     [HttpDelete("{cartId}/remove/{courseId}")]
-    public async Task<ActionResult> RemoveItem(int cartId, int courseId)
+    public async Task<ActionResult> RemoveItem(string cartId, int courseId)
     {
         var result = await cartService.RemoveItemAsync(cartId, courseId);
         if (!result.IsSuccess)
@@ -52,7 +52,7 @@ public class CartsController(CartService cartService) : BaseController
 
 
     [HttpDelete("{cartId}/clear")]
-    public async Task<ActionResult> ClearCart(int cartId)
+    public async Task<ActionResult> ClearCart(string cartId)
     {
         var result = await cartService.ClearCartAsync(cartId);
         if (!result.IsSuccess)
@@ -63,6 +63,6 @@ public class CartsController(CartService cartService) : BaseController
                 Errors = result.Errors
             });
 
-        return Ok();
+        return Ok(result.Value);
     }
 }

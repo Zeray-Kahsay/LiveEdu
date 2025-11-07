@@ -1,14 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/store/store";
-import { clearCart, removeItem } from "./CartSlice";
-import { useCreatePaymentIntentMutation } from "./cartApi";
+import { clearCart} from "./CartSlice";
+import { useClearCartMutation, useCreatePaymentIntentMutation, useRemoveItemFromCartMutation } from "./cartApi";
 
 export default function CartPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const items  = useAppSelector((state) => state.cart.cart?.items ?? []);
+  const totalPrice  = useAppSelector((state) => state.cart.cart?.total ?? 0);
   const [createPaymentIntent, { isLoading }] = useCreatePaymentIntentMutation();
-const cartId = useAppSelector((state) => state.cart.cart?.id);
+  const [removeItemFromCart, {isLoading: isRemoving}] = useRemoveItemFromCartMutation();
+  const [clearCart] = useClearCartMutation();
+const cart = useAppSelector((state) => state.cart.cart);
+const cartId = cart?.cartId;
+
+console.log(totalPrice);
 
 
 if ( items.length === 0) {
@@ -25,8 +31,9 @@ if ( items.length === 0) {
     );
   }
   
-  const total = 100; 
-  items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
 
 const handleProceedToCheckout = async () => {
   if (!cartId) {
@@ -55,6 +62,8 @@ const handleProceedToCheckout = async () => {
 };
 
 
+
+
   return (
     <div className="max-w-5xl mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
@@ -77,7 +86,11 @@ const handleProceedToCheckout = async () => {
             <div className="text-right">
               <p className="text-lg font-semibold">${item.price.toFixed(2)}</p>
               <button
-                onClick={() => dispatch(removeItem(item.courseId))}
+                onClick={() => {
+                  if (cart?.cartId) {
+                    removeItemFromCart({ cartId: cart.cartId, courseId: item.courseId })
+                  }
+                } }
                 className="text-red-600 text-sm hover:underline mt-2"
               >
                 Remove
@@ -89,7 +102,11 @@ const handleProceedToCheckout = async () => {
 
       <div className="mt-10 flex justify-between items-center">
         <button
-          onClick={() => dispatch(clearCart())}
+          onClick={() => {
+            if (cartId){
+              clearCart(cartId);
+            }
+          }}
           className="text-gray-500 hover:underline"
         >
           Clear Cart

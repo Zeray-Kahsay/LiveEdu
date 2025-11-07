@@ -10,6 +10,6 @@ public interface ICartService
     Task<Result<CartDto>> AddItemAsync(int courseId, string? cartId, int userId);
     Task<Result<CartDto>> MergeCartsAsync(string guestCartId, int userId);
     //Task<Result<Cart>> UpdateCartAsync(Cart cart);
-    Task<Result<Cart>> RemoveItemAsync(int id, int courseId);
-    Task<Result> ClearCartAsync(int id);
+    Task<Result<CartDto>> RemoveItemAsync(string id, int courseId);
+    Task<Result<CartDto>> ClearCartAsync(string id);
 }

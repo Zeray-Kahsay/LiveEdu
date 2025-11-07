@@ -1,5 +1,6 @@
 import { apiSlice } from "../../app/api/apiSlice";
 import type { Cart } from "../../app/types/cart/Cart";
+import { setCart } from "./CartSlice";
 
 interface PaymentIntentResponse {
   clientSecret: string;
@@ -25,20 +26,37 @@ export const cartApi = apiSlice.injectEndpoints({
 
     //Remove item from cart
     removeItemFromCart: builder.mutation<Cart, { cartId: string; courseId: number }>({
-      query: ({ cartId, courseId }) => ({
-        url: `/carts/${cartId}/remove/${courseId}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: (_, _error, { cartId }) => [{ type: "Cart", id: cartId }],
-    }),
+  query: ({ cartId, courseId }) => ({
+    url: `/carts/${cartId}/remove/${courseId}`,
+    method: "DELETE",
+  }),
+  async onQueryStarted({}, { dispatch, queryFulfilled }) {
+    try {
+      const { data } = await queryFulfilled;
+      //Update Redux with updated cart from backend
+      dispatch(setCart(data));
+    } catch (err) {
+      console.error("Failed to remove item from cart:", err);
+    }
+  },
+}),
 
     // Clear cart
-    clearCart: builder.mutation<void, string>({
+    clearCart: builder.mutation<Cart, string>({
       query: (cartId) => ({
         url: `/carts/${cartId}/clear`,
         method: "DELETE",
       }),
-      invalidatesTags: (_result, _error, cartId) => [{ type: "Cart", id: cartId }],
+       async onQueryStarted({}, { dispatch, queryFulfilled }) {
+    try {
+      const { data } = await queryFulfilled;
+      // Update Redux with updated cart from backend
+      dispatch(setCart(data));
+    } catch (err) {
+      console.error("Failed to remove item from cart:", err);
+    }
+  },
+      //invalidatesTags: (_result, _error, cartId) => [{ type: "Cart", id: cartId }],
     }),
 
     // Create or update payment intent (Stripe)

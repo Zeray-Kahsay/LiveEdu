@@ -2,7 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Cart } from "../../app/types/cart/Cart";
 import type { CartItem } from "../../app/types/cart/CartItem";
 
-// ✅ Load from localStorage
+
 const storedCart = localStorage.getItem("cart");
 const initialState: {
    cart: Cart | null
@@ -12,7 +12,7 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    // ✅ Replace entire cart (e.g., after addItem or fetch)
+    //  Replace entire cart (e.g., after addItem or fetch)
     setCart: (state, action: PayloadAction<Cart>) => {
       const cart  = action.payload;
       const total = cart.items.reduce((sum, curr) => sum + curr.price * curr.quantity, 0);
@@ -21,13 +21,13 @@ const cartSlice = createSlice({
       
     },
 
-    // ✅ Clear cart (e.g., after successful checkout)
+    // Clear cart (e.g., after successful checkout)
     clearCart: (state) => {
       state.cart = null;
       localStorage.removeItem("cart");
     },
 
-    // ✅ Optional: remove one item (client-side only)
+    // Optional: remove one item (client-side only)
     removeItem: (state, action: PayloadAction<number>) => {
       if (!state.cart) return;
       state.cart.items = state.cart.items.filter(

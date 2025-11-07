@@ -92,53 +92,59 @@ public class CartService(
     }
 
 
-    public async Task<Result> ClearCartAsync(int id)
+    public async Task<Result<CartDto>> ClearCartAsync(string id)
     {
         try
         {
             // Get the cart 
-            var cart = await cartRepository.GetCartByIdAsync(id);
-            if (cart is null) return Result.Failure("Cart not found");
+            //var cart = await cartRepository.GetCartByIdAsync(id);
+            var cart = await context.Carts
+              .Include(c => c.Items)
+              .FirstOrDefaultAsync(c => c.CartId == id);
+            if (cart is null) return Result<CartDto>.Failure("Cart not found");
 
             // if found clear the items
             context.CartItems.RemoveRange(cart.Items);
 
             if (await cartRepository.SaveChangesAsync())
-                return Result.Success();
+                return Result<CartDto>.Success(cart.ToCartDto());
 
-            return Result.Failure("Failed to clear cart");
+            return Result<CartDto>.Failure("Failed to clear cart");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error clearing cart {id}", id);
-            return Result.Failure("An error occurred while clearing the cart");
+            return Result<CartDto>.Failure("An error occurred while clearing the cart");
         }
     }
 
-    public async Task<Result<Cart>> RemoveItemAsync(int id, int courseId)
+    public async Task<Result<CartDto>> RemoveItemAsync(string id, int courseId)
     {
         try
         {
             // Get the cart 
-            var cart = await cartRepository.GetCartByIdAsync(id);
-            if (cart is null) return Result<Cart>.Failure("Cart not found");
+            //var cart = await cartRepository.GetCartByIdAsync(id);
+            var cart = await context.Carts
+                .Include(c => c.Items)
+                .FirstOrDefaultAsync(c => c.CartId == id);
+            if (cart is null) return Result<CartDto>.Failure("Cart not found");
 
             // Get the item from the cart - and then remove it
             var item = cart.Items.FirstOrDefault(i => i.CourseId == courseId);
-            if (item is null) return Result<Cart>.Failure("Item not found in cart");
+            if (item is null) return Result<CartDto>.Failure("Item not found in cart");
 
             cart.Items.Remove(item);
 
             // Persist the change in DB
             if (await cartRepository.SaveChangesAsync())
-                return Result<Cart>.Success(cart);
+                return Result<CartDto>.Success(cart.ToCartDto());
 
-            return Result<Cart>.Failure("Failed to remove item");
+            return Result<CartDto>.Failure("Failed to remove item");
         }
         catch (Exception ex)
         {
             logger.LogError($"Error removing an item from cart id: {id} and course id: {courseId}", ex);
-            return Result<Cart>.Failure("An error occurred while removing item from cart");
+            return Result<CartDto>.Failure("An error occurred while removing item from cart");
         }
     }
 

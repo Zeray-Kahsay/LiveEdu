@@ -16,7 +16,7 @@ public class PaymentsController(
     IConfiguration config) : BaseController
 {
     [HttpPost("create-payment-intent")]
-    public async Task<ActionResult<PaymentIntentResponseDto>> CreatePaymentIntent([FromBody] Cart dto)
+    public async Task<ActionResult<PaymentIntentResponseDto>> CreatePaymentIntent([FromBody] PaymentIntentRequestDto dto)
     {
 
         var cart = await context.Carts
@@ -57,10 +57,12 @@ public class PaymentsController(
     [HttpPost("webhook")]
     public async Task<IActionResult> Webhook()
     {
-        var json = await new StreamReader(Request.Body).ReadToEndAsync();
+        var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
 
         try
         {
+            logger.LogInformation("Webhook received: {Body}", json); // debug line
+
             var stripeEvent = ConstructStripeEvent(json);
 
             if (stripeEvent.Data.Object is not PaymentIntent intent)

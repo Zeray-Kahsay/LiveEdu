@@ -5,6 +5,7 @@ import { useAppSelector, useAppDispatch } from "../store/store";
 import { Menu, X } from "lucide-react"; // hamburger and X icons
 import { logout } from "../../features/auth/authSlice";
 import CartIcon from "../../features/cart/CartIcon";
+import { clearCart } from "../../features/cart/CartSlice";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,8 +16,9 @@ export default function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    dispatch(clearCart());
+    //localStorage.removeItem("accessToken");
+    //localStorage.removeItem("refreshToken");
   };
 
   return (
