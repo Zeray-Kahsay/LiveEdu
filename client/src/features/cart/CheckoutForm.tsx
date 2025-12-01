@@ -1,5 +1,7 @@
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { useAppDispatch } from "../../app/store/store";
+import { clearCart } from "./CartSlice";
 
 interface CheckoutFormProps {
   clientSecret: string;
@@ -10,8 +12,9 @@ export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) return;
 
@@ -28,6 +31,8 @@ export default function CheckoutForm({ clientSecret }: CheckoutFormProps) {
       setMessage(result.error.message ?? "Payment failed.");
     } else if (result.paymentIntent && result.paymentIntent.status === "succeeded") {
       setMessage("✅ Payment succeeded! You are now enrolled.");
+      dispatch(clearCart());
+      
     }
 
     setLoading(false);

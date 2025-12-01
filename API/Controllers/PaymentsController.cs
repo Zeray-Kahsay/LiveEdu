@@ -172,29 +172,28 @@ public class PaymentsController(
             return;
         }
 
-        if (cart.UserId is null)
+        if (cart.UserId is not null)
         {
-            logger.LogWarning("Guest checkout - skipping enrollment");
-            return;
-        }
-
-        // Enroll user in all courses
-        foreach (var item in cart.Items)
-        {
-            var exists = await context.Enrollments
-                .AnyAsync(e => e.CourseId == item.CourseId && e.StudentId == cart.UserId);
-
-            if (!exists)
+            // Enroll user in all courses
+            foreach (var item in cart.Items)
             {
-                context.Enrollments.Add(new Enrollment
+                var exists = await context.Enrollments
+                    .AnyAsync(e => e.CourseId == item.CourseId && e.StudentId == cart.UserId);
+
+                if (!exists)
                 {
-                    CourseId = item.CourseId,
-                    StudentId = cart.UserId.Value,
-                    EnrolledAt = DateTime.UtcNow,
-                    Status = EnrollmentStatus.Enrolled
-                });
+                    context.Enrollments.Add(new Enrollment
+                    {
+                        CourseId = item.CourseId,
+                        StudentId = cart.UserId.Value,
+                        EnrolledAt = DateTime.UtcNow,
+                        Status = EnrollmentStatus.Enrolled
+                    });
+                }
             }
+
         }
+
 
         // Clear cart after success
         context.CartItems.RemoveRange(cart.Items);

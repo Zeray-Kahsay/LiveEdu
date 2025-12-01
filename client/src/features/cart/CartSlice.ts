@@ -25,6 +25,7 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.cart = null;
       localStorage.removeItem("cart");
+      localStorage.removeItem("cartId");
     },
 
     // Optional: remove one item (client-side only)
